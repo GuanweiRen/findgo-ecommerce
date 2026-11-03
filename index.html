@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>FindGo · Maletas inteligentes que te siguen</title>
+<meta name="description" content="Maletas inteligentes con Follow Me, localización en tiempo real y personalización. Prototipo académico.">
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light">
+<link rel="icon" type="image/png" href="img/favicon.png"><link rel="apple-touch-icon" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/pages.css"><link rel="stylesheet" href="css/look.css">
+</head>
+<body data-page="home">
+<main>
+
+<section class="mosaic container">
+  <article class="tile tile-xl" aria-roledescription="carrusel" aria-label="Modelos y colores">
+    <h1 class="tile-h">Equípate para tu próximo viaje</h1>
+    <div class="tile-art slides" id="hero-slides"></div>
+    <a class="tile-btn dark" id="hero-link" href="catalogo.html?cat=maletas">Maletas con Follow Me</a>
+    <button class="tile-pause" id="car-pause" aria-label="Pausar cambio automático"></button>
+  </article>
+  <article class="tile tile-sky"><div class="tile-art" data-art="medium" data-color="coral"></div><a class="tile-btn light" href="#tamano">Elige tu tamaño</a></article>
+  <article class="tile tile-ink"><div class="tile-art" data-art="cabin" data-color="azul" data-ini="AMG"></div><a class="tile-btn light" href="catalogo.html?cat=personalizacion">Personalización</a></article>
+</section>
+
+<section class="section container" id="recs"><div class="sec-head"><h2>Nuestras recomendaciones</h2><div class="arrows"><button class="sq-btn" id="rail-prev" aria-label="Anterior"></button><button class="sq-btn" id="rail-next" aria-label="Siguiente"></button></div></div>
+<div class="rail" id="reco" tabindex="0"></div><div class="rail-bar" aria-hidden="true"><i id="rail-thumb"></i></div></section>
+
+<section class="section container" id="estilos" style="padding-top:0"><h2>Compra tus estilos favoritos</h2><div class="styles" id="styles"></div></section>
+
+<section class="section container" id="tamano" style="padding-top:0">
+  <h2>¿Qué maleta necesitas?</h2><p class="muted" style="max-width:560px">Dinos cuánto viajas y te recomendamos el tamaño.</p>
+  <div class="seg" role="radiogroup" aria-label="Duración del viaje" id="trip-seg"><button role="radio" aria-checked="true" data-d="corto">1 a 3 días</button><button role="radio" aria-checked="false" data-d="semana">4 a 7 días</button><button role="radio" aria-checked="false" data-d="largo">Más de una semana o en familia</button></div>
+  <div class="sizes" id="sizes"></div>
+</section>
+
+<section class="looks" id="como">
+  <article class="look" id="follow-me"><div class="look-art pale-a" id="art-follow"></div><div class="look-text"><span class="tag">Follow Me</span><h2>Tu maleta, a tu paso</h2><p>Te sigue por el aeropuerto a tu ritmo, esquiva obstáculos y frena cuando te paras. Si se agota la batería, las ruedas giran libres y la llevas como cualquier otra.</p><div class="look-prod"><strong>CABIN</strong><span>Maleta inteligente · 55 × 40 × 23 cm</span><b>€ 349,00</b></div><a class="link-u" href="producto.html?id=cabin">Descubre la Cabin</a></div></article>
+  <article class="look flip" id="localizacion"><div class="look-art pale-b" id="art-map"></div><div class="look-text"><span class="tag">Localización</span><h2>Siempre sabes dónde está</h2><p>La ves en el mapa desde la app, también cuando está facturada. Un módulo con pila propia, como un AirTag, sigue activo en bodega durante meses.</p><div class="look-prod"><strong>FINDGO PREMIUM</strong><span>App, historial y alertas</span><b>€ 2,99 / mes</b></div><a class="link-u" href="producto.html?id=premium">Descubre Premium</a></div></article>
+  <article class="look" id="baterias"><div class="look-art pale-c" id="art-bat"></div><div class="look-text"><span class="tag">Para viajar en avión</span><h2>Dos baterías para facturar sin problemas</h2><p>Desde 2018, las aerolíneas exigen quitar la batería de las maletas inteligentes antes de facturarlas (norma IATA). La batería de movimiento, de 98 Wh, se saca con un clic y viaja contigo en cabina. El localizador lleva una pila propia y sigue activo en bodega.</p><div class="look-prod"><strong>BATERÍA EXTRA</strong><span>98 Wh · Power bank USB-C</span><b>€ 59,00</b></div><a class="link-u" href="producto.html?id=bateria">Descubre la batería</a></div></article>
+</section>
+
+<section class="section container" id="personaliza"><h2>Hazla tuya</h2><div class="pers" id="pers"></div></section>
+
+<section class="section container" id="comparar" style="padding-top:0"><h2>Compara los modelos</h2>
+<div class="table-wrap"><table class="cmp"><thead><tr><th>Modelo</th><th>Cabin 55</th><th>Medium 65</th><th>Large 75</th><th>Lite 55</th></tr></thead><tbody id="cmp"></tbody></table></div></section>
+
+<section class="section container" style="padding-top:0"><h2>Frente a la competencia</h2>
+<div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Empresas</th><th>Precio aprox.</th><th>Su debilidad</th></tr></thead><tbody id="comp"></tbody></table></div>
+<p class="demo-note">Precios de la competencia aproximados (octubre 2026). Frente a «maleta barata + AirTag», FindGo lleva el localizador integrado y siempre activo, y además te sigue.</p></section>
+
+<section class="section container" id="opiniones" style="padding-top:0"><h2>Lo que dicen los viajeros</h2>
+<div class="rev-sum"><span class="big">4,7</span><div><div class="st" aria-hidden="true">★★★★★</div><span class="muted small">Valoración media de las opiniones de ejemplo</span></div></div>
+<div class="revs" id="revs"></div><p class="demo-note">Opiniones de ejemplo escritas para este prototipo; no son de clientes reales.</p></section>
+
+<section class="section container" id="faq" style="padding-top:0"><h2>Antes de comprar</h2><div class="faq-list" id="faq-list"></div></section>
+
+<section class="club-sec" id="club"><div class="container club"><div><h2>Únete al club FindGo</h2><p>Consigue un 10 % de descuento en tu primera compra, novedades y consejos de viaje. Sin spam, y te das de baja cuando quieras.</p></div><div id="club-box"></div></div></section>
+
+</main>
+<script src="js/data.js"></script><script src="js/store.js"></script><script src="js/art.js"></script><script src="js/layout.js"></script>
+<script src="js/pages-shop.js"></script>
+</body>
+</html>

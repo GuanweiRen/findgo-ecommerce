@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Catálogo · FindGo</title>
+<meta name="description" content="Maletas, equipaje, personalización, accesorios y servicios FindGo.">
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light">
+<link rel="icon" type="image/png" href="img/favicon.png"><link rel="apple-touch-icon" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/pages.css"><link rel="stylesheet" href="css/look.css">
+</head>
+<body data-page="catalog">
+<main>
+
+<div class="cat-top" id="cat-top">
+  <div class="ct-crumbs"><a href="index.html" aria-label="Volver al inicio">‹</a> <a href="index.html">Inicio</a> / <span id="crumb">Catálogo</span></div>
+  <label class="ct-sort"><span>Ordenado por</span><select id="sort"><option value="">Destacados</option><option value="asc">Precio: menor a mayor</option><option value="desc">Precio: mayor a menor</option></select></label>
+  <button class="ct-filter" id="filter-open" aria-controls="filters" aria-expanded="true"><span>Filtros</span><span class="f-badge" id="f-badge" hidden></span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+</div>
+<div class="cat-layout" id="cat-layout">
+  <div class="f-back" id="f-back" hidden></div>
+  <div class="cat-main">
+    <div class="cat-head"><h1 id="cat-title">Catálogo</h1><p class="cat-desc" id="cat-desc"></p><p class="muted small" id="count" aria-live="polite"></p></div>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+    <div id="promo"></div>
+  </div>
+  <aside class="filters" id="filters" aria-label="Filtros"></aside>
+</div>
+
+</main>
+<script src="js/data.js"></script><script src="js/store.js"></script><script src="js/art.js"></script><script src="js/layout.js"></script>
+<script src="js/pages-shop.js"></script>
+</body>
+</html>

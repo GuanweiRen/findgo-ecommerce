@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Finalizar compra · FindGo</title>
+<meta name="description" content="Datos de envío y pago en una sola página.">
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light">
+<link rel="icon" type="image/png" href="img/favicon.png"><link rel="apple-touch-icon" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/pages.css"><link rel="stylesheet" href="css/look.css">
+</head>
+<body data-page="checkout">
+<main>
+<div class="container section" style="padding-top:28px"><ol class="steps"><li class="done"><span>✓</span>Carrito</li><li class="on"><span>2</span>Datos y pago</li><li class=""><span>3</span>Confirmación</li></ol><h1 style="font-size:2.2rem">Finalizar compra</h1>
+<div class="co-grid"><form id="form" novalidate>
+<p class="guest">Compra como invitado: no necesitas crear una cuenta. Pago de prueba, no se cobra nada.</p>
+<section class="co-sec"><h2><span>1</span> Contacto</h2>
+<div class="field"><label for="f-email">Correo electrónico</label><input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" required maxlength="120"><span class="err">Introduce un correo válido.</span></div>
+<div class="field"><label for="f-tel">Teléfono (para el transportista)</label><input id="f-tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" required maxlength="20"><span class="err">Introduce un teléfono válido (9 cifras).</span></div></section>
+<section class="co-sec"><h2><span>2</span> Entrega</h2>
+<div class="row2"><div class="field"><label for="f-name">Nombre</label><input id="f-name" name="name" autocomplete="given-name" required maxlength="60"><span class="err">Escribe tu nombre.</span></div>
+<div class="field"><label for="f-last">Apellidos</label><input id="f-last" name="last" autocomplete="family-name" required maxlength="80"><span class="err">Escribe tus apellidos.</span></div></div>
+<div class="field"><label for="f-addr">Calle y número</label><input id="f-addr" name="addr" autocomplete="street-address" required maxlength="120"><span class="err">Escribe tu dirección.</span></div>
+<div class="row2"><div class="field"><label for="f-cp">Código postal</label><input id="f-cp" name="cp" inputmode="numeric" autocomplete="postal-code" maxlength="5" required><span class="err">Debe tener 5 cifras.</span></div>
+<div class="field"><label for="f-city">Ciudad</label><input id="f-city" name="city" autocomplete="address-level2" required maxlength="60"><span class="err">Escribe tu ciudad.</span></div></div>
+<div class="field"><label for="f-country">País</label><select id="f-country" disabled><option>España (península y Baleares)</option></select></div>
+<p class="lbl" style="font-weight:600;margin:6px 0 10px">Método de envío</p><div id="ship-opts"></div></section>
+<section class="co-sec"><h2><span>3</span> Pago</h2>
+<div class="test-card"><strong>Pago de prueba.</strong> Usa la tarjeta <code>4242 4242 4242 4242</code>, cualquier fecha futura y cualquier CVC de 3 cifras. <strong>No se cobra nada.</strong></div>
+<div class="field"><label for="c-name">Titular de la tarjeta</label><input id="c-name" autocomplete="cc-name" required maxlength="80"><span class="err">Escribe el nombre del titular.</span></div>
+<div class="field"><label for="c-num">Número de tarjeta</label><input id="c-num" inputmode="numeric" autocomplete="cc-number" placeholder="4242 4242 4242 4242" maxlength="19" required><span class="err" id="c-num-err">Usa la tarjeta de prueba 4242 4242 4242 4242.</span></div>
+<div class="row2"><div class="field"><label for="c-exp">Caducidad (MM/AA)</label><input id="c-exp" inputmode="numeric" autocomplete="cc-exp" placeholder="12/29" maxlength="5" required><span class="err">Fecha no válida o caducada.</span></div>
+<div class="field"><label for="c-cvc">CVC</label><input id="c-cvc" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="3" required><span class="err">3 cifras.</span></div></div>
+<label class="check"><input type="checkbox" id="c-terms" required><span>He leído los <a href="terminos.html" target="_blank" rel="noopener">términos y condiciones</a> y la <a href="privacidad.html" target="_blank" rel="noopener">política de privacidad</a>.</span></label>
+<button class="btn btn-primary btn-lg btn-block" type="submit" id="pay">Confirmar pedido (simulado)</button>
+<p class="muted small" style="text-align:center;margin:12px 0 0">Devolución gratis en 30 días · Garantía de 3 años</p></section>
+</form><aside class="summary" id="summary" aria-label="Resumen"></aside></div></div>
+<div class="mobile-pay" id="mpay"><div class="tt"><small>Total</small><strong id="mpay-total"></strong></div><button class="btn btn-primary" type="submit" form="form">Confirmar pedido</button></div>
+</main>
+<script src="js/data.js"></script><script src="js/store.js"></script><script src="js/art.js"></script><script src="js/layout.js"></script>
+<script src="js/pages-checkout.js"></script>
+</body>
+</html>
