@@ -381,3 +381,23 @@ body[data-page="catalog"] .club-tab { display: none; }
 .site-header .logo { line-height: 0; }
 .site-header .logo img { display: block; height: 40px; width: auto; }
 @media (max-width: 1099px) { .site-header .logo img { height: 34px; } }
+
+/* ---------- Barra azul: por encima de la cabecera (el desplegable ES se veía detrás) y con cruz ---------- */
+.announce { position: relative; z-index: 70; }
+.ann-r { padding-right: 38px; }
+.ann-x { position: absolute; right: calc(var(--gutter) - 8px); top: 50%; transform: translateY(-50%); width: 32px; height: 32px; display: grid; place-items: center; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+.ann-x .icon { width: 16px; height: 16px; }
+@media (hover: hover) and (pointer: fine) { .ann-x:hover { opacity: .6; } }
+@media (max-width: 1099px) { .ann-t { padding-inline: 34px; } .ann-x { right: calc(var(--gutter) - 10px); } }
+
+/* ---------- Tipo de letra de las iniciales ---------- */
+.p-font .box { min-width: 84px; gap: 2px; }
+.font-sample { font-size: 1.3rem; line-height: 1.15; text-transform: none; letter-spacing: .04em; }
+
+/* ---------- Pago: métodos y paneles ---------- */
+.pay-panel { margin: 14px 0 6px; }
+.pay-panel[hidden] { display: none; }
+.pay-note { margin: 0 0 14px; padding: 12px 14px; background: var(--surface-2); border: 1px solid var(--line); font-size: .88rem; color: var(--ink-2); }
+.save-data { margin-top: 8px; }
+.pm-row { display: grid; gap: 14px; }
+.p-font { margin-top: 18px; }

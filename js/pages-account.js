@@ -31,14 +31,47 @@
       if (tab === "pedidos") body = orders.length ? orders.map(orderHTML).join("") : '<div class="empty"><h3>Aún no has hecho ningún pedido</h3><a class="btn btn-primary" href="catalogo.html?cat=maletas">Ver maletas</a></div>';
       if (tab === "favoritos") body = favs.length ? '<div class="grid">' + favs.map(FG.card).join("") + '</div>' : '<div class="empty"><h3>No tienes favoritos</h3><p>Pulsa el corazón en cualquier producto.</p></div>';
       if (tab === "suscripciones") body = '<div class="panel"><h3>Club FindGo</h3>' + (club ? '<p>Suscrito con <strong>' + esc(club.email) + '</strong>. Tu código: <span class="mono"><strong>CLUB10</strong></span> (−10 %).</p>' : '<p class="muted">Aún no eres del club. <a href="index.html#club">Únete y consigue un 10 %</a>.</p>') + '</div><div class="panel" style="margin-top:14px"><h3>FindGo Premium</h3>' + (subs ? '<p>Activa (2,99 €/mes, simulada).</p><button class="btn btn-ghost btn-sm" id="cancel-sub">Cancelar suscripción</button>' : '<p class="muted">No tienes Premium. <a href="producto.html?id=premium">Descubrir</a>.</p>') + '</div>';
-      if (tab === "datos") body = '<div class="panel"><h3>' + esc(s.name) + '</h3><p class="muted" style="margin:0">' + esc(s.email) + '</p></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="btn btn-ghost" id="logout">Cerrar sesión</button><button class="btn btn-ghost" id="wipe">Borrar todos los datos de prueba</button></div><p class="muted small">Esto vacía carrito, pedidos, favoritos y club de este navegador.</p>';
+      if (tab === "datos") {
+        var pr = FG.profile.get(), nm = (s.name || "").split(" "), val = function (k, d) { return esc(pr[k] != null && pr[k] !== "" ? pr[k] : d || ""); };
+        var c = pr.country && FG.COUNTRIES[pr.country] ? pr.country : "ES", pm = pr.pay || "card";
+        var fld = function (id, label, k, d, attrs) { return '<div class="field"><label for="' + id + '">' + label + '</label><input id="' + id + '" name="' + k + '" value="' + val(k, d) + '" ' + (attrs || "") + '><span class="err">Revisa este dato.</span></div>'; };
+        body = '<form id="pf" class="panel" novalidate><h3>Mis datos y preferencias</h3><p class="muted small" style="margin-top:0">Se guardan en este navegador y rellenan el pago en tus próximas compras.</p>' +
+          '<div class="row2">' + fld("pf-name", "Nombre", "name", nm[0], 'autocomplete="given-name" maxlength="60"') + fld("pf-last", "Apellidos", "last", nm.slice(1).join(" "), 'autocomplete="family-name" maxlength="80"') + '</div>' +
+          '<div class="row2">' + fld("pf-email", "Correo electrónico", "email", s.email, 'type="email" autocomplete="email" maxlength="120"') + fld("pf-tel", "Teléfono", "tel", "", 'type="tel" autocomplete="tel" maxlength="20"') + '</div>' +
+          '<h3 style="margin-top:18px">Dirección de envío</h3>' + fld("pf-addr", "Calle y número", "addr", "", 'autocomplete="street-address" maxlength="120"') +
+          '<div class="row2">' + fld("pf-cp", "Código postal", "cp", "", 'autocomplete="postal-code" maxlength="8"') + fld("pf-city", "Ciudad", "city", "", 'autocomplete="address-level2" maxlength="60"') + '</div>' +
+          '<div class="field"><label for="pf-country">País</label><select id="pf-country" name="country">' + Object.keys(FG.COUNTRIES).map(function (k) { return '<option value="' + k + '"' + (k === c ? " selected" : "") + '>' + esc(FG.COUNTRIES[k].n) + '</option>'; }).join("") + '</select></div>' +
+          '<h3 style="margin-top:18px">Forma de pago preferida</h3><div class="field"><label for="pf-pay">Método</label><select id="pf-pay" name="pay">' + FG.PAYMENTS.map(function (m) { return '<option value="' + m[0] + '"' + (m[0] === pm ? " selected" : "") + '>' + esc(m[1]) + '</option>'; }).join("") + '</select></div>' +
+          '<div id="pf-bizum"' + (pm === "bizum" ? "" : " hidden") + '>' + fld("pf-bz", "Móvil asociado a Bizum", "bizumTel", pr.tel, 'type="tel" maxlength="20"') + '</div>' +
+          '<div id="pf-paypal"' + (pm === "paypal" ? "" : " hidden") + '>' + fld("pf-pp", "Correo de PayPal", "paypalMail", s.email, 'type="email" maxlength="120"') + '</div>' +
+          '<button class="btn btn-primary" type="submit">Guardar mis datos</button></form>' +
+          '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="btn btn-ghost" id="logout">Cerrar sesión</button><button class="btn btn-ghost" id="wipe">Borrar todos los datos de prueba</button></div><p class="muted small">Borrar vacía carrito, pedidos, favoritos, club y datos guardados de este navegador.</p>';
+      }
       root.innerHTML = '<p class="muted">Hola, <strong>' + esc(s.name) + '</strong></p><div class="tabs" role="tablist">' + tabs.map(function (t) { return '<button role="tab" aria-selected="' + (t[0] === tab) + '" data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join("") + '</div><div>' + body + '</div>';
     }
     root.addEventListener("click", function (e) {
       var t = e.target.closest("[data-tab]"); if (t) { tab = t.dataset.tab; history.replaceState(null, "", "#" + tab); draw(); return; }
       if (e.target.closest("#logout")) { FG.session.logout(); draw(); }
       if (e.target.closest("#cancel-sub")) { FG.subs.set(false); FG.toast("Suscripción cancelada"); draw(); }
-      if (e.target.closest("#wipe") && window.confirm("¿Borrar todos los datos de prueba?")) { ["cart", "orders", "favs", "club", "session", "subs", "checkout", "orderSeq"].forEach(function (k) { FG.write(k, k === "orders" || k === "cart" || k === "favs" ? [] : null); }); draw(); }
+      if (e.target.closest("#wipe") && window.confirm("¿Borrar todos los datos de prueba?")) { ["cart", "orders", "favs", "club", "session", "subs", "checkout", "orderSeq", "profile"].forEach(function (k) { FG.write(k, k === "orders" || k === "cart" || k === "favs" ? [] : k === "profile" ? {} : null); }); draw(); }
+    });
+    root.addEventListener("change", function (e) {
+      if (e.target.id !== "pf-pay") return;
+      $("#pf-bizum").hidden = e.target.value !== "bizum"; $("#pf-paypal").hidden = e.target.value !== "paypal";
+    });
+    root.addEventListener("submit", function (e) {
+      if (e.target.id !== "pf") return;
+      e.preventDefault();
+      var f = e.target, v = function (n) { return f.elements[n].value.trim(); };
+      var ok = [mark(f.elements.name, v("name").length > 0), mark(f.elements.email, emailOk(v("email")))];
+      if (v("tel")) ok.push(mark(f.elements.tel, v("tel").replace(/[\s.\-+()]/g, "").replace(/^34/, "").length >= 9));
+      if (v("cp")) ok.push(mark(f.elements.cp, FG.country(f.elements.country.value).cp.test(v("cp"))));
+      if (f.elements.pay.value === "bizum" && v("bizumTel")) ok.push(mark(f.elements.bizumTel, v("bizumTel").replace(/[\s.\-+()]/g, "").replace(/^34/, "").length === 9));
+      if (f.elements.pay.value === "paypal" && v("paypalMail")) ok.push(mark(f.elements.paypalMail, emailOk(v("paypalMail"))));
+      if (ok.indexOf(false) > -1) { var bad = f.querySelector(".field.bad input"); if (bad) bad.focus(); return; }
+      FG.profile.set({ name: v("name"), last: v("last"), email: v("email"), tel: v("tel"), addr: v("addr"), cp: v("cp").toUpperCase(), city: v("city"), country: f.elements.country.value, pay: f.elements.pay.value, bizumTel: v("bizumTel"), paypalMail: v("paypalMail") });
+      FG.session.login((v("name") + " " + v("last")).trim(), v("email"));
+      FG.toast("Datos guardados"); draw();
     });
     document.addEventListener("fg:change", function (e) { if (e.detail === "favs") draw(); });
     window.addEventListener("hashchange", function () { tab = (location.hash || "#pedidos").slice(1); draw(); });

@@ -163,7 +163,17 @@
     ["¿La ubicación de mi maleta es privada?", "Solo tú la ves. El historial se borra a los 30 días. Más detalle en la política de privacidad."]
   ];
 
+  // Tipos de letra para las iniciales: f = familia CSS, w = grosor, k = tamaño relativo, ls = espaciado
+  var FONTS = {
+    clasica:   { n: "Clásica",           f: "Archivo, sans-serif",              w: 500, k: 1,    ls: 3 },
+    elegante:  { n: "Elegante",          f: "'Playfair Display', serif",        w: 600, k: 1,    ls: 2 },
+    manuscrita:{ n: "Manuscrita",        f: "'Dancing Script', cursive",        w: 600, k: 1.25, ls: 1 },
+    maquina:   { n: "Máquina de escribir", f: "'Special Elite', monospace",     w: 400, k: .95,  ls: 3 },
+    redondeada:{ n: "Redondeada",        f: "Fredoka, sans-serif",              w: 500, k: 1.05, ls: 3 }
+  };
+
   window.FG = window.FG || {};
+  FG.FONTS = FONTS;
   FG.COLORS = COLORS; FG.CATS = CATS; FG.PRODUCTS = P; FG.MENU = MENU; FG.COMPETITION = COMPETITION; FG.REVIEWS = REVIEWS; FG.FAQ = FAQ;
   FG.product = function (id) { return P.filter(function (p) { return p.id === id; })[0]; };
 })();

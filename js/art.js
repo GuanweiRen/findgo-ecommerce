@@ -8,6 +8,7 @@
   var BOT = 182;
 
   /* Maleta de ranuras finas. x, w, h en unidades del viewBox; apoyada en BOT. */
+  var curFont = "clasica";
   function suit(x, w, h, hex, ini, led) {
     var y = BOT - h, cx = x + w / 2, lt = light(hex), ink = lt ? "20,22,28" : "255,255,255", g = "";
     var n = Math.max(4, Math.floor(w / 8));
@@ -15,7 +16,7 @@
       var gx = x + (w * i) / n;
       g += '<path d="M' + gx + ' ' + (y + 10) + 'V' + (y + h - 10) + '" stroke="rgba(0,0,0,.17)" stroke-width="1.3"/><path d="M' + (gx + 1.4) + ' ' + (y + 10) + 'V' + (y + h - 10) + '" stroke="rgba(255,255,255,.16)" stroke-width="1"/>';
     }
-    var txt = ini ? '<text x="' + cx + '" y="' + (y + h * 0.54) + '" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="500" font-size="' + Math.min(w * 0.25, 24) + '" fill="rgba(' + ink + ',.92)" letter-spacing="3" style="paint-order:stroke">' + FG.esc(ini) + '</text>' : "";
+    var txt = ini ? '<text x="' + cx + '" y="' + (y + h * 0.54) + '" text-anchor="middle" font-family="' + FG.FONTS[curFont].f.replace(/"/g, "'") + '" font-weight="' + FG.FONTS[curFont].w + '" font-size="' + Math.min(w * 0.25, 24) * FG.FONTS[curFont].k + '" fill="rgba(' + ink + ',.92)" letter-spacing="' + FG.FONTS[curFont].ls + '" style="paint-order:stroke">' + FG.esc(ini) + '</text>' : "";
     return '<path d="M' + (x + w * 0.3) + ' ' + y + 'V' + (y - 16) + 'M' + (x + w * 0.7) + ' ' + y + 'V' + (y - 16) + '" ' + S(2, 3) + '/>' +
       '<rect x="' + (x + w * 0.24) + '" y="' + (y - 24) + '" width="' + w * 0.52 + '" height="9" rx="2" ' + F(1) + '/>' +
       '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="14" fill="' + hex + '"/>' + g +
@@ -30,6 +31,7 @@
   FG.art = function (kind, colorKey, o) {
     o = o || {};
     var hex = (FG.COLORS[colorKey] || FG.COLORS.azul).hex, s = o.scale || 1, ini = o.initials || "", body = "", rx = 56;
+    curFont = FG.FONTS[o.font] ? o.font : "clasica";
     switch (kind) {
       case "suitcase": var w = 66 + 34 * s, h = 70 + 86 * s; rx = w * 0.6; body = suit(100 - w / 2, w, h, hex, ini, true); break;
       case "pack2": rx = 90; body = suit(28, 64, 100, hex, "", true) + suit(108, 84, 134, hex, "", true); break;
@@ -41,7 +43,7 @@
       case "engrave": body = suit(54, 92, 140, hex, ini || "AB", false); break;
       case "wheel": body = '<circle cx="100" cy="110" r="54" ' + F(1) + '/><circle cx="100" cy="110" r="36" fill="' + hex + '"/><circle cx="100" cy="110" r="36" fill="url(#sh)"/><circle cx="100" cy="110" r="10" ' + F(1) + '/><path d="M100 74v72M64 110h72M74 84l52 52M126 84l-52 52" stroke="rgba(0,0,0,.18)" stroke-width="1.5"/><rect x="68" y="34" width="64" height="10" rx="3" fill="' + hex + '"/>'; break;
       case "cover": body = '<rect x="38" y="40" width="124" height="146" rx="14" fill="none" stroke="' + hex + '" stroke-width="2" stroke-dasharray="5 5"/><rect x="38" y="40" width="124" height="146" rx="14" fill="' + hex + '" opacity=".16"/>' + suit(66, 68, 110, "#b9bdc6", "", false).replace(/<circle[^>]*\/>/g, ""); break;
-      case "tag": body = '<path d="M100 20v38" ' + S(1, 3) + '/><rect x="62" y="56" width="76" height="116" rx="6" fill="' + hex + '"/><rect x="62" y="56" width="76" height="116" rx="6" fill="url(#sh)"/><circle cx="100" cy="74" r="6" fill="var(--bg)"/><rect x="68" y="88" width="64" height="78" rx="3" fill="none" stroke="rgba(255,255,255,.4)" stroke-dasharray="3 3"/><text x="100" y="138" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="500" font-size="22" fill="rgba(255,255,255,.92)" letter-spacing="3">' + FG.esc(ini || "FG") + '</text>'; break;
+      case "tag": body = '<path d="M100 20v38" ' + S(1, 3) + '/><rect x="62" y="56" width="76" height="116" rx="6" fill="' + hex + '"/><rect x="62" y="56" width="76" height="116" rx="6" fill="url(#sh)"/><circle cx="100" cy="74" r="6" fill="var(--bg)"/><rect x="68" y="88" width="64" height="78" rx="3" fill="none" stroke="rgba(255,255,255,.4)" stroke-dasharray="3 3"/><text x="100" y="138" text-anchor="middle" font-family="' + FG.FONTS[curFont].f + '" font-weight="' + FG.FONTS[curFont].w + '" font-size="' + 22 * FG.FONTS[curFont].k + '" fill="rgba(255,255,255,.92)" letter-spacing="' + FG.FONTS[curFont].ls + '">' + FG.esc(ini || "FG") + '</text>'; break;
       case "battery": body = '<rect x="42" y="68" width="116" height="74" rx="8" ' + F(1) + '/><rect x="158" y="92" width="8" height="26" rx="2" ' + F(2) + '/><path d="M58 84v42M72 84v42M86 84v42" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/><path d="M122 80l-16 26h14l-6 22 20-30h-14z" fill="#2f5bff"/>'; break;
       case "charger": body = '<rect x="64" y="52" width="72" height="76" rx="8" style="fill:var(--art-3);stroke:var(--art-2)" stroke-width="1.5"/><rect x="90" y="128" width="20" height="24" rx="3" ' + F(2) + '/><path d="M100 152v28" ' + S(2, 4) + '/><rect x="88" y="70" width="24" height="10" rx="2" ' + F(1) + '/>'; break;
       case "lock": body = '<path d="M72 98V78a28 28 0 0 1 56 0v20" ' + S(2, 9) + '/><rect x="54" y="96" width="92" height="76" rx="8" ' + F(1) + '/><circle cx="100" cy="128" r="8" style="fill:var(--bg)"/><rect x="98" y="132" width="4" height="14" style="fill:var(--bg)"/>'; break;
@@ -56,8 +58,8 @@
     }
     return '<svg viewBox="0 0 200 200" role="img" aria-hidden="true" focusable="false">' + DEFS + '<ellipse cx="100" cy="191" rx="' + rx + '" ry="3.5" fill="#000" opacity=".12"/>' + body + '</svg>';
   };
-  FG.productArt = function (p, color, ini) {
+  FG.productArt = function (p, color, ini, font) {
     var c = color || (p.colors && p.colors[0]) || (p.kind === "tag" ? "cuero" : "azul");
-    return FG.art(p.kind, c, { scale: p.scale, initials: ini });
+    return FG.art(p.kind, c, { scale: p.scale, initials: ini, font: font });
   };
 })();

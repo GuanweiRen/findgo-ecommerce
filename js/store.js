@@ -29,7 +29,7 @@
   };
 
   /* ---------- Carrito ---------- */
-  // línea: { key, id, qty, color, initials, variant }
+  // línea: { key, id, qty, color, initials, font, variant }
   FG.cart = {
     get: function () { return read("cart", []); },
     count: function () { return this.get().reduce(function (a, l) { return a + l.qty; }, 0); },
@@ -37,7 +37,8 @@
     add: function (opt) {
       var p = FG.product(opt.id); if (!p || p.price == null) return null;
       var line = { id: p.id, qty: Math.max(1, opt.qty || 1), color: opt.color || null, initials: (opt.initials || "").trim().slice(0, 3).toUpperCase(), variant: opt.variant || null };
-      line.key = [line.id, line.color, line.initials, line.variant].join("|");
+      line.font = line.initials ? (FG.FONTS[opt.font] ? opt.font : "clasica") : null;
+      line.key = [line.id, line.color, line.initials, line.font, line.variant].join("|");
       var cart = this.get(), ex = cart.filter(function (l) { return l.key === line.key; })[0];
       if (ex) ex.qty = Math.min(p.single ? 1 : 99, ex.qty + line.qty); else cart.push(line);
       if (p.single) line.qty = 1;
@@ -68,6 +69,32 @@
   };
 
   FG.FREE_FROM = 99;
+
+  /* ---------- Países de envío (importes de ejemplo para el prototipo) ---------- */
+  // cp: validación del código postal · std/exp: envío estándar/express · free: envío estándar gratis desde · days: días laborables
+  FG.COUNTRIES = {
+    ES: { n: "España (península y Baleares)", cp: /^\d{5}$/, ph: "28001", std: 4.95, exp: 9.95, free: 99, days: [3, 5], cpErr: "Debe tener 5 cifras." },
+    PT: { n: "Portugal", cp: /^\d{4}-?\d{3}$/, ph: "1000-001", std: 6.95, exp: 14.95, free: 149, days: [4, 6], cpErr: "Formato 0000-000." },
+    FR: { n: "Francia", cp: /^\d{5}$/, ph: "75001", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 5 cifras." },
+    IT: { n: "Italia", cp: /^\d{5}$/, ph: "00100", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 5 cifras." },
+    DE: { n: "Alemania", cp: /^\d{5}$/, ph: "10115", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 5 cifras." },
+    NL: { n: "Países Bajos", cp: /^\d{4}\s?[A-Za-z]{2}$/, ph: "1011 AB", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Formato 0000 AA." },
+    BE: { n: "Bélgica", cp: /^\d{4}$/, ph: "1000", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 4 cifras." },
+    GB: { n: "Reino Unido", cp: /^[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[A-Za-z]{2}$/, ph: "SW1A 1AA", std: 14.95, exp: 24.95, free: 249, days: [7, 10], cpErr: "Código postal no válido." }
+  };
+  FG.country = function (k) { return FG.COUNTRIES[k] || FG.COUNTRIES.ES; };
+
+  /* ---------- Métodos de pago (simulados) ---------- */
+  FG.PAYMENTS = [
+    ["card", "Tarjeta de crédito o débito", "Visa, Mastercard. En este prototipo solo vale la tarjeta de prueba."],
+    ["bizum", "Bizum", "Paga con tu móvil desde la app de tu banco."],
+    ["paypal", "PayPal", "Con tu cuenta de PayPal."],
+    ["applepay", "Apple Pay", "Con Touch ID o Face ID."],
+    ["googlepay", "Google Pay", "Con las tarjetas guardadas en tu cuenta de Google."],
+    ["transfer", "Transferencia bancaria", "El pedido se prepara al recibir el pago."]
+  ];
+  FG.payName = function (k) { var p = FG.PAYMENTS.filter(function (x) { return x[0] === k; })[0]; return p ? p[1] : ""; };
+
   FG.totals = function (lines, opts) {
     opts = opts || {};
     var sub = 0, eligible = 0;
@@ -76,8 +103,9 @@
     var discount = club ? Math.round(eligible * 10) / 100 : 0;
     var net = sub - discount, ship = 0;
     if (lines.length) {
-      if (opts.shipping === "express") ship = 9.95;
-      else ship = net >= FG.FREE_FROM ? 0 : 4.95;
+      var c = FG.country(opts.country);
+      if (opts.shipping === "express") ship = c.exp;
+      else ship = net >= c.free ? 0 : c.std;
     }
     return { sub: sub, discount: discount, ship: ship, total: Math.round((net + ship) * 100) / 100, club: club };
   };
@@ -111,6 +139,13 @@
       return "FG-2026-" + String(10000 + n * 7 + Math.floor(Math.random() * 6));
     }
   };
+  // Datos del cliente para rellenar el pago en próximas compras
+  // { name, last, email, tel, addr, cp, city, country, pay, bizumTel, paypalMail }
+  FG.profile = {
+    get: function () { return read("profile", {}); },
+    set: function (patch) { var p = this.get(); for (var k in patch) p[k] = patch[k]; write("profile", p); },
+    clear: function () { write("profile", {}); }
+  };
   FG.session = {
     get: function () { return read("session", null); },
     login: function (name, email) { write("session", { name: name, email: email }); },
@@ -123,7 +158,7 @@
 
   FG.orderSummary = function (o) {
     var t = o.totals;
-    return o.lines.map(function (l) { return '<div class="sum-item"><span>' + l.qty + ' × ' + FG.esc(l.name) + (l.initials ? ' (' + FG.esc(l.initials) + ')' : "") + (l.color ? ' · ' + FG.esc(FG.colorName(l.color)) : "") + '</span><span class="mono">' + FG.eur(l.unit * l.qty) + '</span></div>'; }).join("") +
+    return o.lines.map(function (l) { return '<div class="sum-item"><span>' + l.qty + ' × ' + FG.esc(l.name) + (l.initials ? ' (' + FG.esc(l.initials) + (l.font && l.font !== "clasica" && FG.FONTS[l.font] ? ' · ' + FG.esc(FG.FONTS[l.font].n) : "") + ')' : "") + (l.color ? ' · ' + FG.esc(FG.colorName(l.color)) : "") + '</span><span class="mono">' + FG.eur(l.unit * l.qty) + '</span></div>'; }).join("") +
       '<hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><div class="sum-row"><span>Subtotal</span><span>' + FG.eur(t.sub) + '</span></div>' +
       (t.discount ? '<div class="sum-row disc"><span>CLUB10 (−10 %)</span><span>−' + FG.eur(t.discount) + '</span></div>' : "") +
       '<div class="sum-row"><span>Envío ' + (o.shipping === "express" ? "express" : "estándar") + '</span><span>' + (t.ship ? FG.eur(t.ship) : "Gratis") + '</span></div><div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div>';
@@ -131,7 +166,7 @@
 
   function addDays(n) { var d = new Date(), k = 0; while (k < n) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) k++; } return d; }
   function fmtDay(d) { return d.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" }).replace(".", ""); }
-  FG.deliveryText = function () { return fmtDay(addDays(3)) + " y " + fmtDay(addDays(5)); };
+  FG.deliveryText = function (days) { days = days || [3, 5]; return fmtDay(addDays(days[0])) + " y " + fmtDay(addDays(days[1])); };
 
 
   FG.colorName = function (k) { return FG.COLORS[k] ? FG.COLORS[k].name : ""; };

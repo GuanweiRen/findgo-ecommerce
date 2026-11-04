@@ -105,11 +105,11 @@
     var opts = [];
     if (line.color) opts.push(FG.colorName(line.color));
     if (line.variant) opts.push(line.variant);
-    if (line.initials) opts.push("Iniciales: " + esc(line.initials));
+    if (line.initials) opts.push("Iniciales: " + esc(line.initials) + (line.font && line.font !== "clasica" && FG.FONTS[line.font] ? " (" + esc(FG.FONTS[line.font].n) + ")" : ""));
     var up = FG.upsell(2);
     d.querySelector(".drawer-inner").innerHTML =
       '<div class="drawer-head"><h2 class="drawer-title"><span class="ok-dot">' + FG.icon("check") + '</span> Añadido al carrito</h2><button class="icon-btn" data-close aria-label="Cerrar">' + FG.icon("close") + '</button></div>' +
-      '<div class="added-item"><div class="thumb">' + FG.productArt(x.p, line.color, line.initials) + '</div><div><strong>' + esc(x.p.name) + '</strong><div class="muted small">' + (opts.join(" · ") || "&nbsp;") + '</div><div class="small"><strong>' + x.line.qty + ' × ' + FG.eur(x.unit) + '</strong></div></div></div>' +
+      '<div class="added-item"><div class="thumb">' + FG.productArt(x.p, line.color, line.initials, line.font) + '</div><div><strong>' + esc(x.p.name) + '</strong><div class="muted small">' + (opts.join(" · ") || "&nbsp;") + '</div><div class="small"><strong>' + x.line.qty + ' × ' + FG.eur(x.unit) + '</strong></div></div></div>' +
       FG.progress(t) +
       (up.length ? '<div class="upsell"><h3>Completa tu viaje</h3>' + up.map(function (p) { return '<div class="up-row"><span class="thumb">' + FG.productArt(p) + '</span><span><strong>' + esc(p.name) + '</strong><span class="muted small">' + FG.eur(p.price) + '</span></span><button class="btn btn-sm" data-quick="' + esc(p.id) + '">Añadir</button></div>'; }).join("") + '</div>' : "") +
       '<div class="drawer-actions"><a class="btn btn-primary btn-lg" href="carrito.html">Ver carrito y pagar (' + FG.cart.count() + ')</a><button class="btn btn-ghost" data-close>Seguir comprando</button></div>';
@@ -128,8 +128,8 @@
       return '<details><summary>' + FG.CATS[m.cat].name + '</summary>' + m.cols.map(function (col) { return '<p class="mn-t">' + col.t + '</p>' + col.links.map(function (l) { return '<a href="' + l[1] + '">' + l[0] + '</a>'; }).join(""); }).join("") + '</details>';
     }).join("");
     return '<a class="skip" href="#main">Saltar al contenido</a>' +
-      '<div class="announce"><div class="ann-in"><span class="ann-l"></span><p class="ann-t"><b>Prototipo académico</b> · Únete al club y consigue un 10 % de descuento. <a href="index.html#club">HAZ CLIC AQUÍ</a></p>' +
-      '<div class="ann-r"><a class="ann-ship" href="devoluciones.html">' + FG.icon("pin") + '<span>Envío a España</span></a><div class="lang"><button class="lang-btn" id="lang-btn" aria-haspopup="true" aria-expanded="false" aria-label="Idioma: español"><span>ES</span>' + FG.icon("chev") + '</button><div class="lang-pop" id="lang-pop" hidden><button class="on" disabled>Español</button><button disabled>English <small>próximamente</small></button></div></div></div></div></div>' +
+      (FG.read("annClosed", false) ? "" : '<div class="announce"><div class="ann-in"><span class="ann-l"></span><p class="ann-t"><b>Prototipo académico</b> · Únete al club y consigue un 10 % de descuento. <a href="index.html#club">HAZ CLIC AQUÍ</a></p>' +
+      '<div class="ann-r"><a class="ann-ship" href="devoluciones.html">' + FG.icon("pin") + '<span>Envío a España</span></a><div class="lang"><button class="lang-btn" id="lang-btn" aria-haspopup="true" aria-expanded="false" aria-label="Idioma: español"><span>ES</span>' + FG.icon("chev") + '</button><div class="lang-pop" id="lang-pop" hidden><button class="on" disabled>Español</button><button disabled>English <small>próximamente</small></button></div></div></div><button class="ann-x" id="ann-x" aria-label="Cerrar el aviso">' + FG.icon("close") + '</button></div></div>') +
       '<header class="site-header"><div class="hbar">' +
       '<div class="h-left"><button class="icon-btn burger" id="burger" aria-label="Abrir menú" aria-expanded="false">' + FG.icon("menu") + '</button></div>' +
       '<a class="logo" href="index.html" aria-label="FindGo, inicio"><img src="img/logo.png" alt="FindGo" width="90" height="40"></a>' +
@@ -194,8 +194,14 @@
 
     // Idioma
     var lb = document.getElementById("lang-btn"), lp = document.getElementById("lang-pop");
-    lb.addEventListener("click", function (e) { e.stopPropagation(); lp.hidden = !lp.hidden; lb.setAttribute("aria-expanded", !lp.hidden); });
-    document.addEventListener("click", function () { lp.hidden = true; lb.setAttribute("aria-expanded", "false"); });
+    if (lb) {
+      lb.addEventListener("click", function (e) { e.stopPropagation(); lp.hidden = !lp.hidden; lb.setAttribute("aria-expanded", !lp.hidden); });
+      document.addEventListener("click", function () { lp.hidden = true; lb.setAttribute("aria-expanded", "false"); });
+    }
+
+    // Cerrar la barra azul (se recuerda en las demás páginas)
+    var ax = document.getElementById("ann-x");
+    if (ax) ax.addEventListener("click", function () { FG.write("annClosed", true); ax.closest(".announce").remove(); });
 
     // Buscador
     var sd = document.getElementById("search-dlg"), si = document.getElementById("search-in"), sr = document.getElementById("search-res");

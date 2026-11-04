@@ -225,7 +225,7 @@
     if (p.href) { location.replace(p.href); return; }
     document.title = FG.lineName(p) + " · FindGo";
     var qc = qs.get("color");
-    var s = { color: p.colors ? (qc && p.colors.indexOf(qc) > -1 ? qc : p.colors[0]) : null, variant: p.variants ? p.variants[0].n : null, initials: "", qty: 1 };
+    var s = { color: p.colors ? (qc && p.colors.indexOf(qc) > -1 ? qc : p.colors[0]) : null, variant: p.variants ? p.variants[0].n : null, initials: "", font: "clasica", qty: 1 };
     var needIni = !!p.needsInitials;
     function unit() {
       var base = p.price;
@@ -236,7 +236,7 @@
     var hasViews = !!p.followMe || p.id === "lite";
     var views = !hasViews ? [["Frontal", "front"]] : p.id === "lite" ? [["Frontal", "front"], ["App", "app"], ["Tamaños", "size"]] : [["Frontal", "front"], ["Batería", "bat"], ["App", "app"], ["Tamaños", "size"]];
     function viewArt(v) {
-      if (v === "front") return { svg: FG.productArt(p, s.color, s.initials), cap: "" };
+      if (v === "front") return { svg: FG.productArt(p, s.color, s.initials, s.font), cap: "" };
       if (v === "bat") return { svg: FG.art("battery", "azul"), cap: "Batería de 98 Wh: se extrae con un clic y viaja contigo en cabina." };
       if (v === "app") return { svg: FG.art("app", "azul"), cap: "Sigue tu maleta en el mapa desde la app, también facturada." };
       return { svg: FG.art("pack3", s.color || "azul"), cap: "Cabin 55 cm · Medium 65 cm · Large 75 cm." };
@@ -253,9 +253,10 @@
     if (p.variants) h += '<div class="p-opt"><div class="p-lab"><b>Talla de la maleta</b></div><div class="boxes" role="radiogroup" aria-label="Talla">' + p.variants.map(function (v) { return '<button class="box" role="radio" aria-checked="false" data-variant="' + v.n + '">' + v.n + '<small>' + FG.eur(v.price) + '</small></button>'; }).join("") + '</div></div>';
     if (p.colors) h += '<div class="p-opt"><div class="p-lab"><b>Color</b> <span id="color-name"></span></div><div class="swatches" role="radiogroup" aria-label="Color">' + p.colors.map(function (c) { return '<button class="swatch" role="radio" aria-checked="false" data-color="' + c + '" aria-label="' + FG.colorName(c) + '"><i style="background:' + FG.COLORS[c].hex + '"></i></button>'; }).join("") + '</div></div>';
     if (p.initials) h += '<div class="field p-ini"><label for="ini">Iniciales grabadas' + (needIni ? "" : " (opcional)") + '</label><input id="ini" maxlength="3" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="Ej.: AMG"><span class="hint">Hasta 3 letras o números. Producto personalizado: no admite devolución salvo defecto.</span><span class="err" id="ini-err">Escribe al menos una inicial.</span></div>';
+    if (p.initials) h += '<div class="p-opt p-font"><div class="p-lab"><b>Tipo de letra</b> <span id="font-name"></span></div><div class="boxes" role="radiogroup" aria-label="Tipo de letra">' + Object.keys(FG.FONTS).map(function (k) { var f = FG.FONTS[k]; return '<button type="button" class="box" role="radio" aria-checked="false" data-font="' + k + '" aria-label="' + esc(f.n) + '"><span class="font-sample" style="font-family:' + f.f + ';font-weight:' + f.w + '">ABC</span><small>' + esc(f.n) + '</small></button>'; }).join("") + '</div></div>';
     if (p.nonReturnable && !p.initials) h += '<div class="note warn">Producto personalizado: no admite devolución salvo defecto (art. 103 TRLGDCU).</div>';
     if (p.monthly) h += '<div class="note">Suscripción simulada: 2,99 € al mes, cancelable desde Mi cuenta. No se aplica el código CLUB10.</div>';
-    h += '<div class="p-buy">' + (p.initials && !needIni ? '<button class="btn btn-block btn-lg btn-outline" id="personalize">' + FG.icon("pencil") + ' Personalizar el producto</button>' : "") + '<button class="btn btn-primary btn-block btn-lg" id="add">Añadir al carrito</button><button class="fav-line" data-fav="' + p.id + '" aria-pressed="false">' + FG.icon("heart") + '<span>Añadir a favoritos</span></button></div>' +
+    h += '<div class="p-buy">' + '<button class="btn btn-primary btn-block btn-lg" id="add">Añadir al carrito</button><button class="fav-line" data-fav="' + p.id + '" aria-pressed="false">' + FG.icon("heart") + '<span>Añadir a favoritos</span></button></div>' +
       '<div class="p-strip">Envío estándar gratis desde ' + FG.eur(99) + ' · Devolución gratuita en 30 días</div>' +
       '<div class="p-reass"><div>' + FG.icon("truck") + '<span>Envíos gratis desde ' + FG.eur(99) + '<br>Devoluciones gratuitas</span></div><div>' + FG.icon("pin") + '<span>Recíbela entre<br>' + FG.deliveryText() + '</span></div></div>';
     var spec = p.spec || [];
@@ -275,19 +276,20 @@
       var u = unit(); $("#price").textContent = FG.eur(u) + (p.monthly ? " / mes" : "");
       $("#mbuy-price").textContent = FG.eur(u * s.qty);
       if (p.colors) { $("#color-name").textContent = FG.colorName(s.color); root.querySelectorAll(".swatch").forEach(function (b) { b.setAttribute("aria-checked", b.dataset.color === s.color); }); }
+      if (p.initials) { $("#font-name").textContent = FG.FONTS[s.font].n; root.querySelectorAll("[data-font]").forEach(function (b) { var on = b.dataset.font === s.font; b.setAttribute("aria-checked", on); b.classList.toggle("on", on); }); }
       if (p.variants) root.querySelectorAll("[data-variant]").forEach(function (b) { b.setAttribute("aria-checked", b.dataset.variant === s.variant); b.classList.toggle("on", b.dataset.variant === s.variant); });
       if (isSuit) root.querySelectorAll(".boxes a.box").forEach(function (a) { a.href = a.href.replace(/&color=[^&]*/, "") + (s.color ? "&color=" + s.color : ""); });
     }
     function add() {
       if (needIni && !s.initials) { $("#ini").closest(".field").classList.add("bad"); $("#ini").focus(); return; }
-      var l = FG.cart.add({ id: p.id, qty: s.qty, color: s.color, variant: s.variant, initials: s.initials });
+      var l = FG.cart.add({ id: p.id, qty: s.qty, color: s.color, variant: s.variant, initials: s.initials, font: s.font });
       if (l) FG.showAdded(l);
     }
     root.addEventListener("click", function (e) {
       var c = e.target.closest("[data-color]"); if (c) { s.color = c.dataset.color; render(); return; }
+      var fo = e.target.closest("[data-font]"); if (fo) { s.font = fo.dataset.font; render(); return; }
       var v = e.target.closest("[data-variant]"); if (v) { s.variant = v.dataset.variant; render(); return; }
       if (e.target.closest("#add")) add();
-      if (e.target.closest("#personalize")) { var i = $("#ini"); i.scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(function () { i.focus({ preventScroll: true }); }, 350); }
       if (e.target.closest(".fav-line")) setTimeout(paintFav, 0);
     });
     var ini = $("#ini");

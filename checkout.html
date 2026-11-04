@@ -9,7 +9,7 @@
 <meta name="color-scheme" content="light">
 <link rel="icon" type="image/png" href="img/favicon.png"><link rel="apple-touch-icon" href="img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Dancing+Script:wght@600&family=Fredoka:wght@500&family=Playfair+Display:wght@600&family=Special+Elite&display=swap">
 <link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/pages.css"><link rel="stylesheet" href="css/look.css">
 </head>
 <body data-page="checkout">
@@ -24,17 +24,26 @@
 <div class="row2"><div class="field"><label for="f-name">Nombre</label><input id="f-name" name="name" autocomplete="given-name" required maxlength="60"><span class="err">Escribe tu nombre.</span></div>
 <div class="field"><label for="f-last">Apellidos</label><input id="f-last" name="last" autocomplete="family-name" required maxlength="80"><span class="err">Escribe tus apellidos.</span></div></div>
 <div class="field"><label for="f-addr">Calle y número</label><input id="f-addr" name="addr" autocomplete="street-address" required maxlength="120"><span class="err">Escribe tu dirección.</span></div>
-<div class="row2"><div class="field"><label for="f-cp">Código postal</label><input id="f-cp" name="cp" inputmode="numeric" autocomplete="postal-code" maxlength="5" required><span class="err">Debe tener 5 cifras.</span></div>
+<div class="row2"><div class="field"><label for="f-cp">Código postal</label><input id="f-cp" name="cp" autocomplete="postal-code" maxlength="8" required><span class="err" id="f-cp-err">Debe tener 5 cifras.</span></div>
 <div class="field"><label for="f-city">Ciudad</label><input id="f-city" name="city" autocomplete="address-level2" required maxlength="60"><span class="err">Escribe tu ciudad.</span></div></div>
-<div class="field"><label for="f-country">País</label><select id="f-country" disabled><option>España (península y Baleares)</option></select></div>
+<div class="field"><label for="f-country">País de entrega</label><select id="f-country" name="country" autocomplete="country"></select></div>
 <p class="lbl" style="font-weight:600;margin:6px 0 10px">Método de envío</p><div id="ship-opts"></div></section>
 <section class="co-sec"><h2><span>3</span> Pago</h2>
+<p class="lbl" style="font-weight:600;margin:0 0 10px">Método de pago</p><div id="pay-opts"></div>
+<div class="pay-panel" data-pay="card">
 <div class="test-card"><strong>Pago de prueba.</strong> Usa la tarjeta <code>4242 4242 4242 4242</code>, cualquier fecha futura y cualquier CVC de 3 cifras. <strong>No se cobra nada.</strong></div>
 <div class="field"><label for="c-name">Titular de la tarjeta</label><input id="c-name" autocomplete="cc-name" required maxlength="80"><span class="err">Escribe el nombre del titular.</span></div>
 <div class="field"><label for="c-num">Número de tarjeta</label><input id="c-num" inputmode="numeric" autocomplete="cc-number" placeholder="4242 4242 4242 4242" maxlength="19" required><span class="err" id="c-num-err">Usa la tarjeta de prueba 4242 4242 4242 4242.</span></div>
 <div class="row2"><div class="field"><label for="c-exp">Caducidad (MM/AA)</label><input id="c-exp" inputmode="numeric" autocomplete="cc-exp" placeholder="12/29" maxlength="5" required><span class="err">Fecha no válida o caducada.</span></div>
 <div class="field"><label for="c-cvc">CVC</label><input id="c-cvc" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="3" required><span class="err">3 cifras.</span></div></div>
+</div>
+<div class="pay-panel" data-pay="bizum" hidden><p class="pay-note"><strong>Pago simulado.</strong> En un pedido real recibirías una solicitud en la app de tu banco. No se cobra nada.</p><div class="field"><label for="z-tel">Móvil asociado a Bizum</label><input id="z-tel" inputmode="tel" autocomplete="tel" maxlength="20"><span class="err">Introduce un móvil de 9 cifras.</span></div></div>
+<div class="pay-panel" data-pay="paypal" hidden><p class="pay-note"><strong>Pago simulado.</strong> En un pedido real te llevaríamos a PayPal para iniciar sesión. No se cobra nada.</p><div class="field"><label for="pp-mail">Correo de tu cuenta de PayPal</label><input id="pp-mail" type="email" inputmode="email" autocapitalize="none" autocomplete="email" maxlength="120"><span class="err">Introduce un correo válido.</span></div></div>
+<div class="pay-panel" data-pay="applepay" hidden><p class="pay-note"><strong>Pago simulado.</strong> En un pedido real confirmarías con Touch ID o Face ID en tu dispositivo Apple. No se cobra nada.</p></div>
+<div class="pay-panel" data-pay="googlepay" hidden><p class="pay-note"><strong>Pago simulado.</strong> En un pedido real elegirías una de las tarjetas guardadas en tu cuenta de Google. No se cobra nada.</p></div>
+<div class="pay-panel" data-pay="transfer" hidden><p class="pay-note"><strong>Pago simulado.</strong> Al confirmar te mostraremos un IBAN de ejemplo. El pedido quedaría pendiente de pago hasta recibir la transferencia. No se cobra nada.</p></div>
 <label class="check"><input type="checkbox" id="c-terms" required><span>He leído los <a href="terminos.html" target="_blank" rel="noopener">términos y condiciones</a> y la <a href="privacidad.html" target="_blank" rel="noopener">política de privacidad</a>.</span></label>
+<label class="check save-data"><input type="checkbox" id="save-data" checked><span>Guardar mis datos y mi método de pago preferido para próximas compras.</span></label>
 <button class="btn btn-primary btn-lg btn-block" type="submit" id="pay">Confirmar pedido (simulado)</button>
 <p class="muted small" style="text-align:center;margin:12px 0 0">Devolución gratis en 30 días · Garantía de 3 años</p></section>
 </form><aside class="summary" id="summary" aria-label="Resumen"></aside></div></div>
