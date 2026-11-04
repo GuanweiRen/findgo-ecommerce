@@ -18,7 +18,7 @@
     h += '<div class="sum-row"><span>Subtotal</span><span>' + FG.eur(t.sub) + '</span></div>';
     if (t.discount) h += '<div class="sum-row disc"><span>CLUB10 (−10 %)</span><span>−' + FG.eur(t.discount) + '</span></div>';
     h += '<div class="sum-row"><span>Envío ' + (co.shipping === "express" ? "express" : "estándar") + '</span><span>' + (t.ship ? FG.eur(t.ship) : "Gratis") + '</span></div>' +
-      '<div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div><p class="muted small" style="margin:8px 0 0">IVA incluido. Prototipo: no se cobra nada.</p>';
+      '<div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div><p class="muted small" style="margin:8px 0 0">IVA incluido.</p>';
     return { html: h, t: t };
   }
   function renderSummary(compact) { var r = summaryHTML(compact); $("#summary").innerHTML = r.html; var m = $("#mpay-total"); if (m) m.textContent = FG.eur(r.t.total); return r.t; }
@@ -93,7 +93,7 @@
     // Métodos de pago: se muestra solo el panel del elegido
     var payBox = $("#pay-opts"), pay = pr.pay && FG.PAYMENTS.some(function (m) { return m[0] === pr.pay; }) ? pr.pay : "card";
     payBox.innerHTML = FG.PAYMENTS.map(function (m) { return '<label class="opt"><input type="radio" name="pay" value="' + m[0] + '"' + (m[0] === pay ? " checked" : "") + '><span class="grow"><strong>' + esc(m[1]) + '</strong><br><span class="muted small">' + esc(m[2]) + '</span></span></label>'; }).join("");
-    function showPay() { pay = f.elements.pay.value; document.querySelectorAll(".pay-panel").forEach(function (p) { p.hidden = p.dataset.pay !== pay; }); $("#pay").textContent = pay === "transfer" ? "Confirmar pedido (simulado)" : "Pagar y confirmar (simulado)"; }
+    function showPay() { pay = f.elements.pay.value; document.querySelectorAll(".pay-panel").forEach(function (p) { p.hidden = p.dataset.pay !== pay; }); $("#pay").textContent = pay === "transfer" ? "Confirmar pedido" : "Pagar y confirmar"; }
     if (pr.bizumTel) $("#z-tel").value = pr.bizumTel; else if (f.elements.tel.value) $("#z-tel").value = f.elements.tel.value;
     if (pr.paypalMail) $("#pp-mail").value = pr.paypalMail; else if (f.elements.email.value) $("#pp-mail").value = f.elements.email.value;
     payBox.addEventListener("change", showPay); showPay();
@@ -149,15 +149,15 @@
   /* ================= CONFIRMACIÓN ================= */
   function payText(o) {
     var p = o.payment;
-    if (!p) return "Tarjeta de prueba •••• " + o.last4;
-    if (p.method === "card") return "Tarjeta de prueba •••• " + p.last4;
-    return FG.payName(p.method) + (p.method === "bizum" && p.tel ? " (" + p.tel + ")" : "") + (p.method === "paypal" && p.mail ? " (" + p.mail + ")" : "") + " (simulado)";
+    if (!p) return "Tarjeta •••• " + o.last4;
+    if (p.method === "card") return "Tarjeta •••• " + p.last4;
+    return FG.payName(p.method) + (p.method === "bizum" && p.tel ? " (" + p.tel + ")" : "") + (p.method === "paypal" && p.mail ? " (" + p.mail + ")" : "");
   }
   function confirm() {
     var id = new URLSearchParams(location.search).get("o"), orders = FG.orders.get(), o = orders.filter(function (x) { return x.id === id; })[0] || (id ? null : orders[0]);
     if (!o) { $("#confirm").innerHTML = '<div class="empty"><h2>No encontramos ese pedido</h2><a class="btn" href="cuenta.html">Ir a Mi cuenta</a></div>'; return; }
     var a = o.address;
-    $("#confirm").innerHTML = '<div class="confirm"><div class="big-ok">' + FG.icon("check") + '</div><h1 style="font-size:2.2rem">Gracias, ' + esc(a.name) + '</h1><p class="muted">Tu pedido simulado está confirmado. Hemos enviado un correo de ejemplo a <strong>' + esc(a.email) + '</strong>.</p><div class="order-no" aria-label="Número de pedido">' + esc(o.id) + '</div>' +
+    $("#confirm").innerHTML = '<div class="confirm"><div class="big-ok">' + FG.icon("check") + '</div><h1 style="font-size:2.2rem">Gracias, ' + esc(a.name) + '</h1><p class="muted">Tu pedido está confirmado. Correo de contacto: <strong>' + esc(a.email) + '</strong>.</p><div class="order-no" aria-label="Número de pedido">' + esc(o.id) + '</div>' +
       '<div class="panel"><h2 style="font-size:1.2rem">Resumen del pedido</h2>' + FG.orderSummary(o) + '</div>' +
       '<div class="panel"><h2 style="font-size:1.2rem">Entrega</h2><p style="margin:0">' + esc(a.name + " " + a.last) + '<br>' + esc(a.addr) + '<br>' + esc(a.cp + " " + a.city) + (a.country ? '<br>' + esc(FG.country(a.country).n) : "") + '<br><span class="muted">' + (o.shipping === "express" ? "Express" : "Estándar") + ' · ' + esc(payText(o)) + '</span></p>' + (o.payment && o.payment.method === "transfer" ? '<p class="muted small" style="margin:12px 0 0">IBAN de ejemplo para la transferencia: <span class="mono">ES00 0000 0000 0000 0000 0000</span> (ficticio). Concepto: ' + esc(o.id) + '.</p>' : "") + '</div>' +
       '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px"><a class="btn btn-primary" href="cuenta.html">Ver en Mi cuenta</a><a class="btn btn-ghost" href="index.html">Volver al inicio</a></div></div>';

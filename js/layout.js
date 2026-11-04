@@ -128,7 +128,7 @@
       return '<details><summary>' + FG.CATS[m.cat].name + '</summary>' + m.cols.map(function (col) { return '<p class="mn-t">' + col.t + '</p>' + col.links.map(function (l) { return '<a href="' + l[1] + '">' + l[0] + '</a>'; }).join(""); }).join("") + '</details>';
     }).join("");
     return '<a class="skip" href="#main">Saltar al contenido</a>' +
-      (FG.read("annClosed", false) ? "" : '<div class="announce"><div class="ann-in"><span class="ann-l"></span><p class="ann-t"><b>Prototipo académico</b> · Únete al club y consigue un 10 % de descuento. <a href="index.html#club">HAZ CLIC AQUÍ</a></p>' +
+      (FG.read("annClosed", false) ? "" : '<div class="announce"><div class="ann-in"><span class="ann-l"></span><p class="ann-t">Únete al club y consigue un 10 % de descuento. <a href="index.html#club">HAZ CLIC AQUÍ</a></p>' +
       '<div class="ann-r"><a class="ann-ship" href="devoluciones.html">' + FG.icon("pin") + '<span>Envío a España</span></a><div class="lang"><button class="lang-btn" id="lang-btn" aria-haspopup="true" aria-expanded="false" aria-label="Idioma: español"><span>ES</span>' + FG.icon("chev") + '</button><div class="lang-pop" id="lang-pop" hidden><button class="on" disabled>Español</button><button disabled>English <small>próximamente</small></button></div></div></div><button class="ann-x" id="ann-x" aria-label="Cerrar el aviso">' + FG.icon("close") + '</button></div></div>') +
       '<header class="site-header"><div class="hbar">' +
       '<div class="h-left"><button class="icon-btn burger" id="burger" aria-label="Abrir menú" aria-expanded="false">' + FG.icon("menu") + '</button></div>' +
@@ -149,7 +149,7 @@
     return '<section class="trust-row"><div class="container trust-in">' +
       '<div class="trust-it"><span class="ic">' + FG.icon("truck") + '</span><div><h4>Envío gratuito</h4><p>Envío estándar gratis desde 99 €, en 3 a 5 días laborables.</p></div></div>' +
       '<div class="trust-it"><span class="ic">' + FG.icon("close").replace('<path d="M6 6l12 12M18 6L6 18"/>', '<path d="M4 8h11a5 5 0 0 1 0 10H8"/><path d="M8 4L4 8l4 4"/>') + '</span><div><h4>Devoluciones gratuitas</h4><p>30 días para devolver, con recogida gratis en tu casa.</p></div></div>' +
-      '<div class="trust-it"><span class="ic">' + FG.icon("check") + '</span><div><h4>Pago seguro</h4><p>Pago de prueba: en este prototipo no se cobra nada.</p></div></div>' +
+      '<div class="trust-it"><span class="ic">' + FG.icon("check") + '</span><div><h4>Pago seguro</h4><p>Pago de prueba: no se cobra nada.</p></div></div>' +
       '<div class="trust-it"><span class="ic">' + FG.icon("check").replace('<path d="M5 12.5l4.5 4.5L19 7.5"/>', '<path d="M12 3l7 3v5c0 4.500-3 8-7 10-4-2-7-5.500-7-10V6z"/><path d="M9 12l2 2 4-4"/>') + '</span><div><h4>Garantía de 3 años</h4><p>Cubre la batería de movimiento y el sistema Follow Me.</p></div></div>' +
       '</div></section>' +
       '<footer class="site-footer"><div class="container foot-grid">' +
@@ -158,7 +158,7 @@
       '<div><h4>La empresa</h4><ul><li><a href="sobre-nosotros.html">Sobre nosotros</a></li><li><a href="index.html#baterias">Cómo funcionan las baterías</a></li><li><a href="index.html#club">Club FindGo</a></li></ul></div>' +
       '<div><h4>Legal</h4><ul><li><a href="privacidad.html">Política de privacidad</a></li><li><a href="cookies.html">Política de cookies</a></li><li><a href="terminos.html">Términos y condiciones</a></li></ul></div>' +
       '</div><div class="container foot-mid"><a class="logo" href="index.html">FindGo</a><div class="social">' + ["Facebook", "Instagram", "YouTube", "TikTok", "Pinterest"].map(function (s) { return '<a href="#" data-fake aria-label="' + s + '">' + s + '</a>'; }).join("") + '</div></div>' +
-      '<div class="container foot-bottom"><span>© 2026 FindGo · Proyecto universitario con empresa ficticia. Precios con IVA incluido.</span><span>Prototipo: tarjeta de prueba 4242 4242 4242 4242</span></div></footer>' +
+      '<div class="container foot-bottom"><span>© 2026 FindGo. Precios con IVA incluido.</span><span>Tarjeta de prueba: 4242 4242 4242 4242</span></div></footer>' +
       '<div class="cookie" id="cookie" role="dialog" aria-label="Cookies" hidden><p><strong>Cookies.</strong> Usamos cookies técnicas y, si lo aceptas, de analítica para mejorar la tienda. <a href="cookies.html">Más información</a></p><div class="cookie-actions"><button class="btn btn-ghost btn-sm" data-ck="necessary">Solo necesarias</button><button class="btn btn-primary btn-sm" data-ck="all">Aceptar todas</button></div></div>' +
       '<a class="club-tab" href="index.html#club" aria-label="Únete al club">' + FG.icon("heart").replace(/<path[^>]*\/>/, '<rect x="3" y="5" width="18" height="14"/><path d="M3 7l9 7 9-7"/>') + '</a>';
   }
@@ -222,7 +222,7 @@
       if (f) { var on = FG.favs.toggle(f.dataset.fav); document.querySelectorAll('[data-fav="' + f.dataset.fav + '"]').forEach(function (b) { b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); }); FG.toast(on ? "Añadido a favoritos" : "Quitado de favoritos"); return; }
       var qk = e.target.closest("[data-quick]");
       if (qk) { var l = FG.cart.add({ id: qk.dataset.quick }); if (l) FG.showAdded(l); return; }
-      if (e.target.closest("[data-fake]")) { e.preventDefault(); FG.toast("Enlace ficticio: es un prototipo académico"); }
+      if (e.target.closest("[data-fake]")) { e.preventDefault(); FG.toast("Enlace no disponible"); }
     });
 
     // Cookies

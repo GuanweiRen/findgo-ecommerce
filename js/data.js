@@ -1,4 +1,4 @@
-/* Fuente única de datos del catálogo. Prototipo académico: nada se vende de verdad. */
+/* Fuente única de datos del catálogo. */
 (function () {
   var COLORS = {
     grafito:   { name: "Grafito",     hex: "#3a3f4a" },

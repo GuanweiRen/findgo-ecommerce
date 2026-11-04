@@ -70,7 +70,7 @@
 
   FG.FREE_FROM = 99;
 
-  /* ---------- Países de envío (importes de ejemplo para el prototipo) ---------- */
+  /* ---------- Países de envío (importes de ejemplo) ---------- */
   // cp: validación del código postal · std/exp: envío estándar/express · free: envío estándar gratis desde · days: días laborables
   FG.COUNTRIES = {
     ES: { n: "España (península y Baleares)", cp: /^\d{5}$/, ph: "28001", std: 4.95, exp: 9.95, free: 99, days: [3, 5], cpErr: "Debe tener 5 cifras." },
@@ -84,9 +84,9 @@
   };
   FG.country = function (k) { return FG.COUNTRIES[k] || FG.COUNTRIES.ES; };
 
-  /* ---------- Métodos de pago (simulados) ---------- */
+  /* ---------- Métodos de pago ---------- */
   FG.PAYMENTS = [
-    ["card", "Tarjeta de crédito o débito", "Visa, Mastercard. En este prototipo solo vale la tarjeta de prueba."],
+    ["card", "Tarjeta de crédito o débito", "Visa, Mastercard. Usa la tarjeta de prueba indicada."],
     ["bizum", "Bizum", "Paga con tu móvil desde la app de tu banco."],
     ["paypal", "PayPal", "Con tu cuenta de PayPal."],
     ["applepay", "Apple Pay", "Con Touch ID o Face ID."],
