@@ -71,9 +71,12 @@
   FG.FREE_FROM = 99;
 
   /* ---------- Países de envío (importes de ejemplo) ---------- */
-  // vat: IVA del país de destino (%) · cp: validación del código postal · std/exp: envío estándar/express · free: envío estándar gratis desde · days: días laborables
+  // vat: impuesto del destino (%) · tax: nombre del impuesto si no es el IVA (IGIC en Canarias, IPSI en Ceuta y Melilla) · cp: validación del código postal · std/exp: envío estándar/express · free: envío estándar gratis desde · days: días laborables
   FG.COUNTRIES = {
-    ES: { n: "España (península y Baleares)", vat: 21, cp: /^\d{5}$/, ph: "28001", std: 4.95, exp: 9.95, free: 99, days: [3, 5], cpErr: "Debe tener 5 cifras." },
+    ES: { n: "España (península y Baleares)", vat: 21, cp: /^(?!35|38|51|52)\d{5}$/, ph: "28001", std: 4.95, exp: 9.95, free: 99, days: [3, 5], cpErr: "Debe tener 5 cifras. Para Canarias, Ceuta o Melilla elige esa zona." },
+    IC: { n: "España (Islas Canarias)", vat: 7, tax: "IGIC", cp: /^(35|38)\d{3}$/, ph: "35001", std: 9.95, exp: 19.95, free: 149, days: [5, 8], cpErr: "En Canarias empieza por 35 o 38.", note: "Envío a Canarias: no lleva IVA; se aplica el IGIC canario (7 %). Nos encargamos del despacho de aduana." },
+    CE: { n: "España (Ceuta)", vat: 10, tax: "IPSI", cp: /^51\d{3}$/, ph: "51001", std: 9.95, exp: 19.95, free: 149, days: [5, 8], cpErr: "En Ceuta empieza por 51.", note: "Envío a Ceuta: no lleva IVA; se aplica el IPSI. Nos encargamos del despacho de aduana." },
+    ML: { n: "España (Melilla)", vat: 10, tax: "IPSI", cp: /^52\d{3}$/, ph: "52001", std: 9.95, exp: 19.95, free: 149, days: [5, 8], cpErr: "En Melilla empieza por 52.", note: "Envío a Melilla: no lleva IVA; se aplica el IPSI. Nos encargamos del despacho de aduana." },
     PT: { n: "Portugal", vat: 23, cp: /^\d{4}-?\d{3}$/, ph: "1000-001", std: 6.95, exp: 14.95, free: 149, days: [4, 6], cpErr: "Formato 0000-000." },
     FR: { n: "Francia", vat: 20, cp: /^\d{5}$/, ph: "75001", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 5 cifras." },
     IT: { n: "Italia", vat: 22, cp: /^\d{5}$/, ph: "00100", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 5 cifras." },
@@ -107,9 +110,10 @@
       if (opts.shipping === "express") ship = c.exp;
       else ship = net >= c.free ? 0 : c.std;
     }
-    var total = Math.round((net + ship) * 100) / 100, vat = FG.country(opts.country).vat;
-    var tax = Math.round((total - total / (1 + vat / 100)) * 100) / 100;
-    return { sub: sub, discount: discount, ship: ship, total: total, club: club, vat: vat, tax: tax, base: Math.round((total - tax) * 100) / 100 };
+    /* Los precios del catálogo llevan el IVA español (21 %). Se quita y se aplica el impuesto del destino. */
+    var dest = FG.country(opts.country), vat = dest.vat, gross = net + ship;
+    var base = Math.round(gross / 1.21 * 100) / 100, tax = Math.round(base * vat) / 100, total = Math.round((base + tax) * 100) / 100;
+    return { sub: sub, discount: discount, ship: ship, total: total, club: club, vat: vat, taxName: dest.tax || "IVA", tax: tax, base: base, adj: Math.round((total - gross) * 100) / 100 };
   };
 
   /* ---------- Favoritos ---------- */
@@ -160,8 +164,14 @@
 
   /* Desglose de impuestos: los precios llevan el IVA incluido */
   FG.taxHTML = function (t, country) {
-    var vat = t.vat != null ? t.vat : FG.country(country).vat, tax = t.tax != null ? t.tax : Math.round((t.total - t.total / (1 + vat / 100)) * 100) / 100;
-    return '<div class="sum-row tax"><span>Base imponible</span><span>' + FG.eur(t.total - tax) + '</span></div><div class="sum-row tax"><span>IVA (' + vat + ' %) incluido</span><span>' + FG.eur(tax) + '</span></div>';
+    var c = FG.country(country), vat = t.vat != null ? t.vat : c.vat, name = t.taxName || c.tax || "IVA", tax = t.tax != null ? t.tax : Math.round((t.total - t.total / (1 + vat / 100)) * 100) / 100;
+    return '<div class="sum-row tax"><span>Base imponible</span><span>' + FG.eur(t.total - tax) + '</span></div><div class="sum-row tax"><span>' + name + ' (' + vat + ' %) incluido</span><span>' + FG.eur(tax) + '</span></div>';
+  };
+
+  /* Diferencia entre el IVA español de los precios y el impuesto del destino */
+  FG.adjHTML = function (t) {
+    if (!t.adj) return "";
+    return '<div class="sum-row ' + (t.adj < 0 ? "disc" : "") + '"><span>Ajuste por impuesto de destino (' + (t.taxName || "IVA") + ' ' + t.vat + ' % en lugar de IVA 21 %)</span><span>' + (t.adj < 0 ? "−" : "+") + FG.eur(Math.abs(t.adj)) + '</span></div>';
   };
 
   FG.orderSummary = function (o) {
@@ -169,7 +179,7 @@
     return o.lines.map(function (l) { return '<div class="sum-item"><span>' + l.qty + ' × ' + FG.esc(l.name) + (l.initials ? ' (' + FG.esc(l.initials) + (l.font && l.font !== "clasica" && FG.FONTS[l.font] ? ' · ' + FG.esc(FG.FONTS[l.font].n) : "") + ')' : "") + (l.color ? ' · ' + FG.esc(FG.colorName(l.color)) : "") + '</span><span class="mono">' + FG.eur(l.unit * l.qty) + '</span></div>'; }).join("") +
       '<hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><div class="sum-row"><span>Subtotal</span><span>' + FG.eur(t.sub) + '</span></div>' +
       (t.discount ? '<div class="sum-row disc"><span>CLUB10 (−10 %)</span><span>−' + FG.eur(t.discount) + '</span></div>' : "") +
-      '<div class="sum-row"><span>Envío ' + (o.shipping === "express" ? "express" : "estándar") + '</span><span>' + (t.ship ? FG.eur(t.ship) : "Gratis") + '</span></div><div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div>' + FG.taxHTML(t, o.address && o.address.country);
+      '<div class="sum-row"><span>Envío ' + (o.shipping === "express" ? "express" : "estándar") + '</span><span>' + (t.ship ? FG.eur(t.ship) : "Gratis") + '</span></div>' + FG.adjHTML(t) + '<div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div>' + FG.taxHTML(t, o.address && o.address.country);
   };
 
   function addDays(n) { var d = new Date(), k = 0; while (k < n) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) k++; } return d; }

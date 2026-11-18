@@ -17,8 +17,8 @@
     if (compact) h += lines.map(function (x) { return '<div class="sum-item"><span>' + x.line.qty + ' × ' + esc(x.p.name) + '</span><span>' + FG.eur(x.total) + '</span></div>'; }).join("") + '<hr style="border:0;border-top:1px solid var(--line);margin:12px 0">';
     h += '<div class="sum-row"><span>Subtotal</span><span>' + FG.eur(t.sub) + '</span></div>';
     if (t.discount) h += '<div class="sum-row disc"><span>CLUB10 (−10 %)</span><span>−' + FG.eur(t.discount) + '</span></div>';
-    h += '<div class="sum-row"><span>Envío ' + (co.shipping === "express" ? "express" : "estándar") + '</span><span>' + (t.ship ? FG.eur(t.ship) : "Gratis") + '</span></div>' +
-      '<div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div>' + FG.taxHTML(t, co.country) + '<p class="muted small" style="margin:8px 0 0">Todos los precios llevan el IVA incluido' + (co.country && co.country !== "ES" ? ' (IVA de ' + esc(FG.country(co.country).n) + ', país de entrega)' : '') + '.</p>';
+    h += '<div class="sum-row"><span>Envío ' + (co.shipping === "express" ? "express" : "estándar") + '</span><span>' + (t.ship ? FG.eur(t.ship) : "Gratis") + '</span></div>' + FG.adjHTML(t) +
+      '<div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div>' + FG.taxHTML(t, co.country) + '<p class="muted small" style="margin:8px 0 0">' + (FG.country(co.country).note ? esc(FG.country(co.country).note) : 'Los precios del catálogo llevan el IVA español incluido' + (co.country && co.country !== "ES" ? '; en el total se aplica el IVA de ' + esc(FG.country(co.country).n) + ', país de entrega' : '') + '.') + '</p>';
     return { html: h, t: t };
   }
   function renderSummary(compact) { var r = summaryHTML(compact); $("#summary").innerHTML = r.html; var m = $("#mpay-total"); if (m) m.textContent = FG.eur(r.t.total); return r.t; }
@@ -84,7 +84,7 @@
       var cc = FG.checkout.get(), c = FG.country(cc.country), cur = cc.shipping, t = FG.totals(FG.lines(), { code: cc.code, country: cc.country }), free = (t.sub - t.discount) >= c.free;
       $("#ship-opts").innerHTML =
         '<label class="opt"><input type="radio" name="ship" value="standard"' + (cur !== "express" ? " checked" : "") + '><span class="grow"><strong>Envío estándar</strong><br><span class="muted small">Llega entre ' + FG.deliveryText(c.days) + (free ? "" : " · gratis desde " + euro(c.free)) + '</span></span><strong>' + (free ? "Gratis" : euro(c.std)) + '</strong></label>' +
-        '<label class="opt"><input type="radio" name="ship" value="express"' + (cur === "express" ? " checked" : "") + '><span class="grow"><strong>Envío express</strong><br><span class="muted small">' + (cc.country === "ES" ? "24 a 48 horas laborables" : "2 a 4 días laborables") + '</span></span><strong>' + euro(c.exp) + '</strong></label>';
+        '<label class="opt"><input type="radio" name="ship" value="express"' + (cur === "express" ? " checked" : "") + '><span class="grow"><strong>Envío express</strong><br><span class="muted small">' + (cc.country === "ES" ? "24 a 48 horas laborables" : /^(IC|CE|ML)$/.test(cc.country) ? "3 a 5 días laborables" : "2 a 4 días laborables") + '</span></span><strong>' + euro(c.exp) + '</strong></label>';
     }
     cpHint(); opts(); renderSummary(true); document.body.classList.add("has-mobile-pay");
     $("#ship-opts").addEventListener("change", function (e) { FG.checkout.set({ shipping: e.target.value }); renderSummary(true); });
