@@ -18,7 +18,7 @@
     h += '<div class="sum-row"><span>Subtotal</span><span>' + FG.eur(t.sub) + '</span></div>';
     if (t.discount) h += '<div class="sum-row disc"><span>CLUB10 (−10 %)</span><span>−' + FG.eur(t.discount) + '</span></div>';
     h += '<div class="sum-row"><span>Envío ' + (co.shipping === "express" ? "express" : "estándar") + '</span><span>' + (t.ship ? FG.eur(t.ship) : "Gratis") + '</span></div>' +
-      '<div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div><p class="muted small" style="margin:8px 0 0">IVA incluido.</p>';
+      '<div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div>' + FG.taxHTML(t, co.country) + '<p class="muted small" style="margin:8px 0 0">Todos los precios llevan el IVA incluido' + (co.country && co.country !== "ES" ? ' (IVA de ' + esc(FG.country(co.country).n) + ', país de entrega)' : '') + '.</p>';
     return { html: h, t: t };
   }
   function renderSummary(compact) { var r = summaryHTML(compact); $("#summary").innerHTML = r.html; var m = $("#mpay-total"); if (m) m.textContent = FG.eur(r.t.total); return r.t; }

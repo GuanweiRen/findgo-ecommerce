@@ -71,16 +71,16 @@
   FG.FREE_FROM = 99;
 
   /* ---------- Países de envío (importes de ejemplo) ---------- */
-  // cp: validación del código postal · std/exp: envío estándar/express · free: envío estándar gratis desde · days: días laborables
+  // vat: IVA del país de destino (%) · cp: validación del código postal · std/exp: envío estándar/express · free: envío estándar gratis desde · days: días laborables
   FG.COUNTRIES = {
-    ES: { n: "España (península y Baleares)", cp: /^\d{5}$/, ph: "28001", std: 4.95, exp: 9.95, free: 99, days: [3, 5], cpErr: "Debe tener 5 cifras." },
-    PT: { n: "Portugal", cp: /^\d{4}-?\d{3}$/, ph: "1000-001", std: 6.95, exp: 14.95, free: 149, days: [4, 6], cpErr: "Formato 0000-000." },
-    FR: { n: "Francia", cp: /^\d{5}$/, ph: "75001", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 5 cifras." },
-    IT: { n: "Italia", cp: /^\d{5}$/, ph: "00100", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 5 cifras." },
-    DE: { n: "Alemania", cp: /^\d{5}$/, ph: "10115", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 5 cifras." },
-    NL: { n: "Países Bajos", cp: /^\d{4}\s?[A-Za-z]{2}$/, ph: "1011 AB", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Formato 0000 AA." },
-    BE: { n: "Bélgica", cp: /^\d{4}$/, ph: "1000", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 4 cifras." },
-    GB: { n: "Reino Unido", cp: /^[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[A-Za-z]{2}$/, ph: "SW1A 1AA", std: 14.95, exp: 24.95, free: 249, days: [7, 10], cpErr: "Código postal no válido." }
+    ES: { n: "España (península y Baleares)", vat: 21, cp: /^\d{5}$/, ph: "28001", std: 4.95, exp: 9.95, free: 99, days: [3, 5], cpErr: "Debe tener 5 cifras." },
+    PT: { n: "Portugal", vat: 23, cp: /^\d{4}-?\d{3}$/, ph: "1000-001", std: 6.95, exp: 14.95, free: 149, days: [4, 6], cpErr: "Formato 0000-000." },
+    FR: { n: "Francia", vat: 20, cp: /^\d{5}$/, ph: "75001", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 5 cifras." },
+    IT: { n: "Italia", vat: 22, cp: /^\d{5}$/, ph: "00100", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 5 cifras." },
+    DE: { n: "Alemania", vat: 19, cp: /^\d{5}$/, ph: "10115", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 5 cifras." },
+    NL: { n: "Países Bajos", vat: 21, cp: /^\d{4}\s?[A-Za-z]{2}$/, ph: "1011 AB", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Formato 0000 AA." },
+    BE: { n: "Bélgica", vat: 21, cp: /^\d{4}$/, ph: "1000", std: 8.95, exp: 17.95, free: 199, days: [5, 8], cpErr: "Debe tener 4 cifras." },
+    GB: { n: "Reino Unido", vat: 20, cp: /^[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[A-Za-z]{2}$/, ph: "SW1A 1AA", std: 14.95, exp: 24.95, free: 249, days: [7, 10], cpErr: "Código postal no válido." }
   };
   FG.country = function (k) { return FG.COUNTRIES[k] || FG.COUNTRIES.ES; };
 
@@ -107,7 +107,9 @@
       if (opts.shipping === "express") ship = c.exp;
       else ship = net >= c.free ? 0 : c.std;
     }
-    return { sub: sub, discount: discount, ship: ship, total: Math.round((net + ship) * 100) / 100, club: club };
+    var total = Math.round((net + ship) * 100) / 100, vat = FG.country(opts.country).vat;
+    var tax = Math.round((total - total / (1 + vat / 100)) * 100) / 100;
+    return { sub: sub, discount: discount, ship: ship, total: total, club: club, vat: vat, tax: tax, base: Math.round((total - tax) * 100) / 100 };
   };
 
   /* ---------- Favoritos ---------- */
@@ -156,12 +158,18 @@
     set: function (v) { write("subs", v); }
   };
 
+  /* Desglose de impuestos: los precios llevan el IVA incluido */
+  FG.taxHTML = function (t, country) {
+    var vat = t.vat != null ? t.vat : FG.country(country).vat, tax = t.tax != null ? t.tax : Math.round((t.total - t.total / (1 + vat / 100)) * 100) / 100;
+    return '<div class="sum-row tax"><span>Base imponible</span><span>' + FG.eur(t.total - tax) + '</span></div><div class="sum-row tax"><span>IVA (' + vat + ' %) incluido</span><span>' + FG.eur(tax) + '</span></div>';
+  };
+
   FG.orderSummary = function (o) {
     var t = o.totals;
     return o.lines.map(function (l) { return '<div class="sum-item"><span>' + l.qty + ' × ' + FG.esc(l.name) + (l.initials ? ' (' + FG.esc(l.initials) + (l.font && l.font !== "clasica" && FG.FONTS[l.font] ? ' · ' + FG.esc(FG.FONTS[l.font].n) : "") + ')' : "") + (l.color ? ' · ' + FG.esc(FG.colorName(l.color)) : "") + '</span><span class="mono">' + FG.eur(l.unit * l.qty) + '</span></div>'; }).join("") +
       '<hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><div class="sum-row"><span>Subtotal</span><span>' + FG.eur(t.sub) + '</span></div>' +
       (t.discount ? '<div class="sum-row disc"><span>CLUB10 (−10 %)</span><span>−' + FG.eur(t.discount) + '</span></div>' : "") +
-      '<div class="sum-row"><span>Envío ' + (o.shipping === "express" ? "express" : "estándar") + '</span><span>' + (t.ship ? FG.eur(t.ship) : "Gratis") + '</span></div><div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div>';
+      '<div class="sum-row"><span>Envío ' + (o.shipping === "express" ? "express" : "estándar") + '</span><span>' + (t.ship ? FG.eur(t.ship) : "Gratis") + '</span></div><div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div>' + FG.taxHTML(t, o.address && o.address.country);
   };
 
   function addDays(n) { var d = new Date(), k = 0; while (k < n) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) k++; } return d; }

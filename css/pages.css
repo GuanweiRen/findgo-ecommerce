@@ -412,3 +412,4 @@ details.faq p { color: var(--ink-2); padding-bottom: 20px; margin: 0; max-width:
 }
 @media (min-width: 560px) and (max-width: 959px) { .cat-main .grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
 
+.sum-row.tax { color: var(--ink-2); font-size: .85rem; padding: 2px 0; } .sum-row.total + .sum-row.tax { margin-top: 6px; }
