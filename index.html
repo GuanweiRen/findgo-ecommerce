@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<title>FindGo · Maletas inteligentes que te siguen</title>
+<title>FindGo · La maleta que te sigue y nunca se pierde</title>
 <meta name="description" content="Maletas inteligentes con Follow Me, localización en tiempo real y personalización.">
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light">
@@ -15,9 +15,67 @@
 <body data-page="home">
 <main>
 
+<section class="pitch" id="idea" aria-roledescription="carrusel" aria-label="La idea de FindGo">
+  <div class="pitch-track" id="pitch-track">
+    <div class="pitch-slide ps-1" role="group" aria-roledescription="diapositiva" aria-label="1 de 4">
+      <div class="container pitch-in">
+        <div class="pitch-text">
+          <span class="pitch-eyebrow">Lo que nadie más hace</span>
+          <h1 class="pitch-h">La maleta que te sigue y nunca se pierde</h1>
+          <p class="pitch-lead">FindGo camina detrás de ti por el aeropuerto con <strong>Follow Me</strong>, la ves en el mapa aunque esté facturada y su batería se saca con un clic para cumplir la norma de las aerolíneas.</p>
+          <ul class="pitch-points">
+            <li><b>Te sigue sola</b><span>A tu paso, esquivando obstáculos</span></li>
+            <li><b>La localizas siempre</b><span>En la app, también en bodega</span></li>
+            <li><b>Lista para facturar</b><span>Dos baterías, norma IATA</span></li>
+          </ul>
+          <div class="pitch-cta"><a class="btn btn-lg pitch-btn" href="producto.html?id=cabin">Descubre la Cabin · 349 €</a><a class="link-u" href="#como">Cómo funciona</a></div>
+        </div>
+        <div class="pitch-art" id="pitch-art"></div>
+      </div>
+    </div>
+    <div class="pitch-slide ps-2" role="group" aria-roledescription="diapositiva" aria-label="2 de 4" aria-hidden="true">
+      <div class="container pitch-in">
+        <div class="pitch-text">
+          <span class="pitch-eyebrow">Follow Me</span>
+          <h2 class="pitch-h">Olvídate de arrastrarla</h2>
+          <p class="pitch-lead">Se empareja con tu móvil y te sigue a 1,5 metros, a tu ritmo. Esquiva obstáculos y frena cuando te paras. Tú caminas con las manos libres.</p>
+          <div class="pitch-cta"><a class="btn btn-lg pitch-btn" href="producto.html?id=cabin">Ver maletas con Follow Me</a><a class="link-u" href="#follow-me">Cómo te sigue</a></div>
+        </div>
+        <div class="pitch-art" id="pitch-art-2"></div>
+      </div>
+    </div>
+    <div class="pitch-slide ps-3" role="group" aria-roledescription="diapositiva" aria-label="3 de 4" aria-hidden="true">
+      <div class="container pitch-in">
+        <div class="pitch-text">
+          <span class="pitch-eyebrow">Localización</span>
+          <h2 class="pitch-h">Siempre sabes dónde está</h2>
+          <p class="pitch-lead">La ves en el mapa desde la app, también cuando está facturada. Si tu maleta no sale por la cinta, sabrás exactamente dónde se ha quedado.</p>
+          <div class="pitch-cta"><a class="btn btn-lg pitch-btn" href="producto.html?id=premium">Descubre FindGo Premium</a><a class="link-u" href="#localizacion">Cómo funciona</a></div>
+        </div>
+        <div class="pitch-art" id="pitch-art-3"></div>
+      </div>
+    </div>
+    <div class="pitch-slide ps-4" role="group" aria-roledescription="diapositiva" aria-label="4 de 4" aria-hidden="true">
+      <div class="container pitch-in">
+        <div class="pitch-text">
+          <span class="pitch-eyebrow">Para viajar en avión</span>
+          <h2 class="pitch-h">Factúrala sin problemas</h2>
+          <p class="pitch-lead">Las aerolíneas exigen quitar la batería de las maletas inteligentes. La nuestra se saca con un clic y viaja contigo en cabina, y el localizador sigue activo en bodega con su propia pila.</p>
+          <div class="pitch-cta"><a class="btn btn-lg pitch-btn" href="producto.html?id=bateria">Ver la batería de 98 Wh</a><a class="link-u" href="#baterias">Por qué dos baterías</a></div>
+        </div>
+        <div class="pitch-art" id="pitch-art-4"></div>
+      </div>
+    </div>
+  </div>
+  <div class="container pitch-nav">
+    <div class="pitch-dots" id="pitch-dots"></div>
+    <div class="pitch-ctrl"><button class="pitch-sq" id="pitch-prev" aria-label="Diapositiva anterior"></button><button class="pitch-sq" id="pitch-pause" aria-label="Pausar cambio automático"></button><button class="pitch-sq" id="pitch-next" aria-label="Diapositiva siguiente"></button></div>
+  </div>
+</section>
+
 <section class="mosaic container">
   <article class="tile tile-xl" aria-roledescription="carrusel" aria-label="Modelos y colores">
-    <h1 class="tile-h">Equípate para tu próximo viaje</h1>
+    <h2 class="tile-h">Equípate para tu próximo viaje</h2>
     <div class="tile-art slides" id="hero-slides"></div>
     <a class="tile-btn dark" id="hero-link" href="catalogo.html?cat=maletas">Maletas con Follow Me</a>
     <button class="tile-pause" id="car-pause" aria-label="Pausar cambio automático"></button>
@@ -43,14 +101,18 @@
   <article class="look" id="baterias"><div class="look-art pale-c" id="art-bat"></div><div class="look-text"><span class="tag">Para viajar en avión</span><h2>Dos baterías para facturar sin problemas</h2><p>Desde 2018, las aerolíneas exigen quitar la batería de las maletas inteligentes antes de facturarlas (norma IATA). La batería de movimiento, de 98 Wh, se saca con un clic y viaja contigo en cabina. El localizador lleva una pila propia y sigue activo en bodega.</p><div class="look-prod"><strong>BATERÍA EXTRA</strong><span>98 Wh · Power bank USB-C</span><b>€ 59,00</b></div><a class="link-u" href="producto.html?id=bateria">Descubre la batería</a></div></article>
 </section>
 
+
+
 <section class="section container" id="personaliza"><h2>Hazla tuya</h2><div class="pers" id="pers"></div></section>
 
 <section class="section container" id="comparar" style="padding-top:0"><h2>Compara los modelos</h2>
 <div class="table-wrap"><table class="cmp"><thead><tr><th>Modelo</th><th>Cabin 55</th><th>Medium 65</th><th>Large 75</th><th>Lite 55</th></tr></thead><tbody id="cmp"></tbody></table></div></section>
 
-<section class="section container" style="padding-top:0"><h2>Frente a la competencia</h2>
+<section class="section container" id="diferencia" style="padding-top:0"><h2>Frente a la competencia</h2>
 <div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Empresas</th><th>Precio aprox.</th><th>Su debilidad</th></tr></thead><tbody id="comp"></tbody></table></div>
 <p class="demo-note">Precios de la competencia aproximados (octubre 2026). Frente a «maleta barata + AirTag», FindGo lleva el localizador integrado y siempre activo, y además te sigue.</p></section>
+
+
 
 <section class="section container" id="opiniones" style="padding-top:0"><h2>Lo que dicen los viajeros</h2>
 <div class="rev-sum"><span class="big">4,7</span><div><div class="st" aria-hidden="true">★★★★★</div><span class="muted small">Valoración media de las opiniones de ejemplo</span></div></div>

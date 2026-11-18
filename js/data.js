@@ -15,7 +15,7 @@
 
   var CATS = {
     maletas:         { name: "Maletas",         desc: "Maletas inteligentes que te siguen y se localizan solas." },
-    equipaje:        { name: "Equipaje",        desc: "Packs, mochilas, bolsas y más para cada tipo de viaje." },
+    equipaje:        { name: "Packs",           desc: "Packs, mochilas, bolsas y más para cada tipo de viaje." },
     personalizacion: { name: "Personalización", desc: "Hazla tuya: iniciales, colores y diseños propios." },
     accesorios:      { name: "Accesorios",      desc: "Baterías, cargadores, fundas y pequeños imprescindibles." },
     servicios:       { name: "Servicios",       desc: "Garantía, app Premium, reparación y soluciones para empresas." }

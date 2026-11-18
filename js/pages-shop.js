@@ -11,6 +11,64 @@
       var p = FG.product(el.dataset.art); el.innerHTML = FG.art(p.kind, el.dataset.color, { scale: p.scale, initials: el.dataset.ini });
     });
 
+    /* Portada: la idea principal en diapositivas */
+    var T = function (x, y, t, o) { return '<text x="' + x + '" y="' + y + '" font-family="Archivo,sans-serif" font-weight="800" letter-spacing="2" fill="#fff" ' + (o || 'font-size="14"') + '>' + t + '</text>'; };
+    var GRID = '<g stroke="#fff" stroke-opacity=".12" fill="none"><path d="M0 80H520M0 180H520M0 280H520M0 380H520M90 0V460M210 0V460M330 0V460M450 0V460"/></g>';
+    var svgOpen = function (label) { return '<svg viewBox="0 0 520 460" role="img" aria-label="' + label + '">'; };
+    $("#pitch-art").innerHTML = svgOpen("La maleta FindGo sigue a su dueño y aparece localizada en el mapa") + GRID +
+      '<path class="pitch-trail" d="M150 360 C230 360 270 170 430 150" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="2 10" stroke-linecap="round"/>' +
+      '<circle cx="430" cy="140" r="34" fill="none" stroke="#fff" stroke-width="1.5"/><circle cx="430" cy="140" r="7" fill="#fff"/>' + T(430, 200, "TÚ", 'font-size="14" text-anchor="middle"') +
+      '<g class="pitch-bag">' + nest(FG.art("suitcase", "coral", { scale: .8 }), 20, 190, 250) + '</g>' +
+      '<circle cx="145" cy="176" r="14" fill="#8fb0ff" class="pulse"/><circle cx="145" cy="176" r="8" fill="#151d5c" stroke="#fff" stroke-width="3"/>' +
+      '<rect x="166" y="150" width="148" height="36" fill="#fff"/><text x="180" y="173" font-family="Archivo,sans-serif" font-size="13" font-weight="800" letter-spacing="1.5" fill="#151d5c">CINTA 4 · T2</text></svg>';
+    $("#pitch-art-2").innerHTML = svgOpen("La maleta sigue a la persona a 1,5 metros") + GRID +
+      '<path d="M40 404H500" stroke="#fff" stroke-opacity=".5" stroke-width="2"/>' +
+      '<path class="pitch-trail" d="M270 330 H420" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="2 10" stroke-linecap="round"/>' +
+      '<path d="M270 350V362M420 350V362M270 356H420" stroke="#fff" stroke-width="1.5"/>' + T(345, 384, "1,5 M", 'font-size="14" text-anchor="middle"') +
+      '<g class="pitch-walk"><circle cx="450" cy="150" r="22" fill="#fff"/><path d="M450 176 V290 M450 290 L424 400 M450 290 L478 400 M450 200 L420 262 M450 200 L482 258" stroke="#fff" stroke-width="12" stroke-linecap="round" fill="none"/></g>' +
+      '<g class="pitch-bag">' + nest(FG.art("suitcase", "salvia", { scale: .8 }), 60, 170, 250) + '</g></svg>';
+    $("#pitch-art-3").innerHTML = svgOpen("Mapa del aeropuerto con la maleta localizada") + GRID +
+      '<path d="M0 400L150 300L270 290L520 120" fill="none" stroke="#fff" stroke-width="2.5"/>' +
+      '<rect x="60" y="60" width="150" height="90" fill="#fff" fill-opacity=".12" stroke="#fff" stroke-opacity=".4"/>' + T(76, 112, "TERMINAL 2", 'font-size="12"') +
+      '<rect x="330" y="300" width="140" height="80" fill="#fff" fill-opacity=".12" stroke="#fff" stroke-opacity=".4"/>' + T(346, 346, "BODEGA", 'font-size="12"') +
+      '<circle cx="270" cy="290" r="22" fill="#9fe3d6" class="pulse"/><path d="M270 296c-16-18-24-30-24-42a24 24 0 0 1 48 0c0 12-8 24-24 42z" fill="#fff"/><circle cx="270" cy="254" r="9" fill="#0f3d3a"/>' +
+      '<rect x="296" y="196" width="168" height="40" fill="#fff"/><text x="312" y="222" font-family="Archivo,sans-serif" font-size="14" font-weight="800" letter-spacing="1.5" fill="#0f3d3a">CINTA 4 · AHORA</text></svg>';
+    $("#pitch-art-4").innerHTML = svgOpen("Batería extraíble de 98 Wh que viaja en cabina") + GRID +
+      '<g class="pitch-bag">' + nest(FG.art("battery", "azul"), 110, 40, 300) + '</g>' +
+      T(260, 380, "98 Wh", 'font-size="58" text-anchor="middle" style="font-stretch:125%"') + T(260, 420, "SE SACA CON UN CLIC · VA EN CABINA", 'font-size="13" text-anchor="middle" fill-opacity=".85"') + '</svg>';
+
+    (function pitchSlider() {
+      var root = $("#idea"), track = $("#pitch-track"), slides = [].slice.call(track.children), n = slides.length, cur = 0, timer = null, paused = false, hold = false, DELAY = 6500;
+      var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches, dots = $("#pitch-dots"), pz = $("#pitch-pause");
+      dots.innerHTML = slides.map(function (s, i) { return '<button class="pitch-dot" aria-label="Ir a la diapositiva ' + (i + 1) + '"><i></i></button>'; }).join("");
+      $("#pitch-prev").innerHTML = FG.icon("left"); $("#pitch-next").innerHTML = FG.icon("right");
+      function go(i, user) {
+        cur = (i + n) % n; track.style.transform = "translateX(" + (-100 * cur) + "%)";
+        slides.forEach(function (s, k) { s.setAttribute("aria-hidden", k !== cur); s.inert = k !== cur; });
+        [].forEach.call(dots.children, function (d, k) { d.classList.toggle("on", k === cur); d.setAttribute("aria-current", k === cur); });
+        restart();
+      }
+      function restart() {
+        clearTimeout(timer); root.classList.remove("run"); void root.offsetWidth;
+        if (paused || hold || reduce || document.hidden) return;
+        root.classList.add("run"); timer = setTimeout(function () { go(cur + 1); }, DELAY);
+      }
+      function paint() { pz.innerHTML = FG.icon(paused ? "play" : "pause"); pz.setAttribute("aria-label", paused ? "Reanudar cambio automático" : "Pausar cambio automático"); }
+      root.style.setProperty("--pitch-delay", DELAY + "ms");
+      $("#pitch-prev").addEventListener("click", function () { go(cur - 1); });
+      $("#pitch-next").addEventListener("click", function () { go(cur + 1); });
+      pz.addEventListener("click", function () { paused = !paused; paint(); restart(); });
+      dots.addEventListener("click", function (e) { var b = e.target.closest(".pitch-dot"); if (b) go([].indexOf.call(dots.children, b)); });
+      root.addEventListener("mouseenter", function () { hold = true; restart(); }); root.addEventListener("mouseleave", function () { hold = false; restart(); });
+      root.addEventListener("focusin", function () { hold = true; restart(); }); root.addEventListener("focusout", function () { hold = false; restart(); });
+      root.addEventListener("keydown", function (e) { if (e.key === "ArrowRight") go(cur + 1); if (e.key === "ArrowLeft") go(cur - 1); });
+      var x0 = null, y0 = 0;
+      track.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; hold = true; restart(); }, { passive: true });
+      track.addEventListener("touchend", function (e) { if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null; hold = false; if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) go(cur + (dx < 0 ? 1 : -1)); else restart(); }, { passive: true });
+      document.addEventListener("visibilitychange", restart);
+      paint(); if (reduce) pz.hidden = true; go(0);
+    })();
+
     /* Mosaico principal: el bloque grande cambia solo de modelo y color */
     var items = [["cabin", "coral"], ["medium", "arena"], ["large", "salvia"]];
     var box = $("#hero-slides"), pauseBtn = $("#car-pause");
