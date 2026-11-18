@@ -32,7 +32,7 @@
 
   /* Intenciones: palabras clave y respuesta */
   var I = [
-    { id: "hola", k: ["hola", "buenas", "buenos dias", "buenas tardes", "hey", "saludos"], a: function () { return "¡Hola! 😊 Pregúntame lo que quieras sobre las maletas FindGo: cómo funcionan, qué tamaño te conviene, envíos, devoluciones, pagos…"; } },
+    { id: "hola", k: ["hola", "livi", "quien eres", "como te llamas", "buenas", "buenos dias", "buenas tardes", "hey", "saludos"], a: function () { return "¡Hola! 😊 Pregúntame lo que quieras sobre las maletas FindGo: cómo funcionan, qué tamaño te conviene, envíos, devoluciones, pagos…"; } },
     { id: "gracias", k: ["gracias", "genial", "perfecto", "adios", "hasta luego"], a: function () { return "¡A ti! Si te surge otra duda, aquí estaré. ¡Buen viaje! ✈️"; } },
     { id: "tamano", k: ["tamano", "talla", "que maleta", "cual me", "recomiend", "dias", "semana", "viaje de", "familia", "hijos", "capacidad", "litros"], a: function (q) {
       var d = days(q), fam = /familia|hijos|ninos|varios|pareja/.test(q);
@@ -72,7 +72,7 @@
     { id: "privacidad", k: ["privacidad", "privada", "mis datos", "rgpd", "espiar", "quien ve"], a: function () { return FG.FAQ[5][1] + " " + link("privacidad.html", "Ver política de privacidad") + "."; } },
     { id: "cuenta", k: ["cuenta", "registr", "sesion", "login", "contrasena", "mis pedidos", "pedido"], a: function () { return "Desde " + link("cuenta.html", "Mi cuenta") + " ves tus pedidos, favoritos y datos guardados. Para registrarte solo necesitas nombre y correo, sin contraseña."; } },
     { id: "empresas", k: ["empresa", "empresas", "b2b", "flota", "factura", "corporativo"], a: function () { return "Tenemos condiciones para empresas: pide presupuesto en " + link("empresas.html", "FindGo para empresas") + "."; } },
-    { id: "humano", k: ["persona", "humano", "agente", "contacto", "contactar", "hablar con", "telefono", "llamar", "email", "correo"], a: function () { return "Soy un asistente automático, pero si necesitas a alguien del equipo puedes escribirnos desde " + link("empresas.html", "el formulario de contacto") + ". También te pueden ayudar las " + link("index.html#faq", "preguntas frecuentes") + "."; } }
+    { id: "humano", k: ["persona", "humano", "agente", "contacto", "contactar", "hablar con", "telefono", "llamar", "email", "correo"], a: function () { return "Soy Livi, una asistente automática, pero si necesitas a alguien del equipo puedes escribirnos desde " + link("empresas.html", "el formulario de contacto") + ". También te pueden ayudar las " + link("index.html#faq", "preguntas frecuentes") + "."; } }
   ];
 
   function answer(text) {
@@ -101,9 +101,9 @@
   var wrap = document.createElement("div");
   wrap.className = "bot";
   wrap.innerHTML =
-    '<button class="bot-fab" id="bot-fab" aria-expanded="false" aria-controls="bot-panel"><span class="bot-fab-ic" aria-hidden="true">' + FG.icon("chat") + '</span><span class="bot-fab-t">¿Te ayudo?</span></button>' +
-    '<section class="bot-panel" id="bot-panel" role="dialog" aria-label="Asistente FindGo" hidden>' +
-      '<header class="bot-head"><span class="bot-ava" aria-hidden="true">FG</span><div><strong>Asistente FindGo</strong><small><i></i>Responde al momento</small></div><button class="bot-x" id="bot-x" aria-label="Cerrar asistente">' + FG.icon("close") + '</button></header>' +
+    '<button class="bot-fab" id="bot-fab" aria-expanded="false" aria-controls="bot-panel"><span class="bot-fab-ic" aria-hidden="true">' + FG.icon("chat") + '</span><span class="bot-fab-t">Pregunta a Livi</span></button>' +
+    '<section class="bot-panel" id="bot-panel" role="dialog" aria-label="Livi, asistente de FindGo" hidden>' +
+      '<header class="bot-head"><span class="bot-ava" aria-hidden="true">L</span><div><strong>Livi</strong><small><i></i>Asistente de FindGo · responde al momento</small></div><button class="bot-x" id="bot-x" aria-label="Cerrar a Livi">' + FG.icon("close") + '</button></header>' +
       '<div class="bot-log" id="bot-log" aria-live="polite"></div>' +
       '<div class="bot-chips" id="bot-chips">' + CHIPS.map(function (c) { return '<button type="button">' + esc(c) + '</button>'; }).join("") + '</div>' +
       '<form class="bot-form" id="bot-form" autocomplete="off"><input id="bot-in" maxlength="300" placeholder="Escribe tu pregunta…" aria-label="Tu pregunta" enterkeyhint="send"><button class="bot-send" aria-label="Enviar">' + FG.icon("right") + '</button></form>' +
@@ -123,7 +123,7 @@
   }
   function open(v) {
     panel.hidden = !v; fab.setAttribute("aria-expanded", v); wrap.classList.toggle("is-open", v);
-    if (v && !started) { started = true; add("it", "¡Hola! Soy el asistente de FindGo 👋 ¿En qué te puedo ayudar? Elige una pregunta o escríbeme la tuya."); }
+    if (v && !started) { started = true; add("it", "¡Hola! Soy Livi, la asistente de FindGo 👋 ¿En qué te puedo ayudar? Elige una pregunta o escríbeme la tuya."); }
     if (v) setTimeout(function () { input.focus(); }, 60); else fab.focus();
   }
   fab.addEventListener("click", function () { open(panel.hidden); });
