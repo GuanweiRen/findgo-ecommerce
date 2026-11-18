@@ -59,8 +59,6 @@
       $("#pitch-next").addEventListener("click", function () { go(cur + 1); });
       pz.addEventListener("click", function () { paused = !paused; paint(); restart(); });
       dots.addEventListener("click", function (e) { var b = e.target.closest(".pitch-dot"); if (b) go([].indexOf.call(dots.children, b)); });
-      root.addEventListener("mouseenter", function () { hold = true; restart(); }); root.addEventListener("mouseleave", function () { hold = false; restart(); });
-      root.addEventListener("focusin", function () { hold = true; restart(); }); root.addEventListener("focusout", function () { hold = false; restart(); });
       root.addEventListener("keydown", function (e) { if (e.key === "ArrowRight") go(cur + 1); if (e.key === "ArrowLeft") go(cur - 1); });
       var x0 = null, y0 = 0;
       track.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; hold = true; restart(); }, { passive: true });
