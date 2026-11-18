@@ -136,11 +136,12 @@
       '<nav class="main-nav" aria-label="Principal"><ul>' + navD + '</ul></nav>' +
       '<div class="h-right"><button class="h-search" id="search-btn" data-search aria-label="Buscar"><span>Buscar</span>' + FG.icon("search") + '</button>' +
       '<button class="icon-btn m-search" data-search aria-label="Buscar">' + FG.icon("search") + '</button>' +
-      '<a class="icon-btn hide-xs" href="cuenta.html" aria-label="Mi cuenta">' + FG.icon("user") + '</a>' +
+      (FG.session && FG.session.get() ? '<a class="icon-btn hide-xs" href="cuenta.html" aria-label="Mi cuenta">' + FG.icon("user") + '</a>' :
+        '<div class="acc-menu hide-xs"><button class="icon-btn" id="acc-btn" aria-label="Cuenta" aria-haspopup="true" aria-expanded="false">' + FG.icon("user") + '</button><div class="acc-pop" id="acc-pop" hidden><p>¡Hola! Entra o crea tu cuenta para seguir tus pedidos y guardar favoritos.</p><a class="btn btn-primary btn-sm btn-block" href="cuenta.html#entrar">Iniciar sesión</a><a class="btn btn-sm btn-block" href="cuenta.html#registro">Registrarse</a></div></div>') +
       '<a class="icon-btn has-badge hide-xs" href="cuenta.html#favoritos" aria-label="Favoritos">' + FG.icon("heart") + '<span class="count" id="fav-count" hidden></span></a>' +
       '<a class="icon-btn has-badge" href="carrito.html" aria-label="Carrito">' + FG.icon("bag") + '<span class="count" id="cart-count"></span></a></div></div></header>' +
       '<div class="mnav-wrap" id="mnav-wrap" hidden><div class="mnav-back" data-mclose></div><aside class="mnav" aria-label="Menú"><div class="mnav-head"><span class="logo-text">Menú</span><button class="icon-btn" data-mclose aria-label="Cerrar menú">' + FG.icon("close") + '</button></div>' + navM +
-      '<div class="mn-links"><a href="cuenta.html">Mi cuenta</a><a href="cuenta.html#favoritos">Favoritos</a><a href="devoluciones.html">Devoluciones y garantía</a><a href="empresas.html">Empresas</a></div></aside></div>' +
+      '<div class="mn-links">' + (FG.session && FG.session.get() ? '<a href="cuenta.html">Mi cuenta</a>' : '<a href="cuenta.html#entrar">Iniciar sesión</a><a href="cuenta.html#registro">Registrarse</a>') + '<a href="cuenta.html#favoritos">Favoritos</a><a href="devoluciones.html">Devoluciones y garantía</a><a href="empresas.html">Empresas</a></div></aside></div>' +
       '<dialog class="search-dlg" id="search-dlg" aria-label="Buscar"><form class="search-form" role="search"><span class="s-ico">' + FG.icon("search") + '</span><input id="search-in" type="search" placeholder="Busca maletas, accesorios…" autocomplete="off" enterkeyhint="search" aria-label="Buscar productos"><button type="button" class="icon-btn" data-close aria-label="Cerrar">' + FG.icon("close") + '</button></form><div class="search-sugg" id="search-sugg"><span>Populares:</span>' + ["Cabin", "Batería", "Candado TSA", "Funda", "Mochila"].map(function (t) { return '<button type="button" data-sugg="' + t + '">' + t + '</button>'; }).join("") + '</div><ul class="search-res" id="search-res"></ul></dialog>' +
       '<dialog class="drawer" id="drawer" aria-label="Carrito"><div class="drawer-inner"></div></dialog><div id="toasts" aria-live="polite"></div>';
   }
@@ -201,6 +202,13 @@
 
     // Cerrar la barra azul (se recuerda en las demás páginas)
     var ax = document.getElementById("ann-x");
+    var ab = document.getElementById("acc-btn"), ap = document.getElementById("acc-pop");
+    if (ab) {
+      ab.addEventListener("click", function (e) { e.stopPropagation(); ap.hidden = !ap.hidden; ab.setAttribute("aria-expanded", !ap.hidden); });
+      ap.addEventListener("click", function (e) { e.stopPropagation(); });
+      document.addEventListener("click", function () { ap.hidden = true; ab.setAttribute("aria-expanded", "false"); });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !ap.hidden) { ap.hidden = true; ab.setAttribute("aria-expanded", "false"); ab.focus(); } });
+    }
     if (ax) ax.addEventListener("click", function () { FG.write("annClosed", true); ax.closest(".announce").remove(); });
 
     // Buscador

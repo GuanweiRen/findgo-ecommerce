@@ -152,6 +152,14 @@
     set: function (patch) { var p = this.get(); for (var k in patch) p[k] = patch[k]; write("profile", p); },
     clear: function () { write("profile", {}); }
   };
+  /* Cuentas registradas en este navegador (sin contraseña) */
+  FG.accounts = {
+    all: function () { return read("accounts", []); },
+    find: function (email) { email = (email || "").trim().toLowerCase(); return this.all().filter(function (a) { return a.email === email; })[0] || null; },
+    add: function (a) { var list = this.all().filter(function (x) { return x.email !== a.email.toLowerCase(); }); a.email = a.email.toLowerCase(); a.date = new Date().toISOString(); list.push(a); write("accounts", list); return a; },
+    remove: function (email) { email = (email || "").toLowerCase(); write("accounts", this.all().filter(function (a) { return a.email !== email; })); }
+  };
+
   FG.session = {
     get: function () { return read("session", null); },
     login: function (name, email) { write("session", { name: name, email: email }); },
