@@ -38,7 +38,7 @@
       T(260, 380, "98 Wh", 'font-size="58" text-anchor="middle" style="font-stretch:125%"') + T(260, 420, "SE SACA CON UN CLIC · VA EN CABINA", 'font-size="13" text-anchor="middle" fill-opacity=".85"') + '</svg>';
 
     (function pitchSlider() {
-      var root = $("#idea"), track = $("#pitch-track"), slides = [].slice.call(track.children), n = slides.length, cur = 0, timer = null, paused = false, hold = false, DELAY = 6500;
+      var root = $("#idea"), track = $("#pitch-track"), slides = [].slice.call(track.children), n = slides.length, cur = 0, timer = null, paused = false, hold = false, DELAY = 10000;
       var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches, dots = $("#pitch-dots"), pz = $("#pitch-pause");
       dots.innerHTML = slides.map(function (s, i) { return '<button class="pitch-dot" aria-label="Ir a la diapositiva ' + (i + 1) + '"><i></i></button>'; }).join("");
       $("#pitch-prev").innerHTML = FG.icon("left"); $("#pitch-next").innerHTML = FG.icon("right");

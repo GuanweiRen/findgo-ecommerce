@@ -436,7 +436,7 @@ body[data-page="catalog"] .club-tab { display: none; }
 .pitch-dot i { position: relative; display: block; width: 100%; height: 3px; background: rgb(255 255 255 / .35); overflow: hidden; }
 .pitch-dot i::after { content: ""; position: absolute; inset: 0; background: #fff; transform: scaleX(0); transform-origin: left; }
 .pitch-dot.on i::after { transform: scaleX(1); }
-.pitch.run .pitch-dot.on i::after { animation: pitchbar var(--pitch-delay, 6500ms) linear both; }
+.pitch.run .pitch-dot.on i::after { animation: pitchbar var(--pitch-delay, 10000ms) linear both; }
 @keyframes pitchbar { from { transform: scaleX(0); } }
 .pitch-ctrl { display: flex; gap: 8px; }
 .pitch-sq { width: 42px; height: 42px; border: 1px solid #fff; background: transparent; color: #fff; display: grid; place-items: center; cursor: pointer; transition: background-color 150ms, color 150ms, transform 140ms var(--ease-out); }
