@@ -178,7 +178,7 @@
         if (keep && !FG.session.get()) FG.session.login(co2.data.name + " " + co2.data.last, co2.data.email);
         FG.cart.clear(); FG.checkout.set({ code: "" });
         // Sin permiso para guardar datos, no queda nada del pedido en curso
-        if (!keep) { try { localStorage.removeItem("fg:checkout"); } catch (e) {} }
+        if (!keep) FG.remove("checkout");
         location.href = "confirmacion.html?o=" + encodeURIComponent(order.id);
       }, 1100);
     });

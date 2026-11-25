@@ -374,7 +374,7 @@
       if (e.target.closest(".fav-line")) setTimeout(paintFav, 0);
     });
     var ini = $("#ini");
-    if (ini) ini.addEventListener("input", function () { ini.value = ini.value.replace(/[^\p{L}\p{N}]/gu, "").toUpperCase().slice(0, 3); s.initials = ini.value; ini.closest(".field").classList.remove("bad"); render(); });
+    if (ini) ini.addEventListener("input", function () { ini.value = ini.value.replace(/[^A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñÀ-ÿ]/g, "").toUpperCase().slice(0, 3); s.initials = ini.value; ini.closest(".field").classList.remove("bad"); render(); });
     $("#mbuy-btn").addEventListener("click", add);
     $("#mbuy").classList.add("on"); document.body.classList.add("has-mobile-buy");
     // En escritorio la barra de compra aparece cuando el botón principal sale de la pantalla

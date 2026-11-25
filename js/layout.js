@@ -39,14 +39,14 @@
 
   /* ---------- Diálogos animados ---------- */
   FG.openDialog = function (d) {
-    if (!d.open) d.showModal();
+    if (!d.open) { if (typeof d.showModal === "function") d.showModal(); else d.setAttribute("open", ""); }
     requestAnimationFrame(function () { requestAnimationFrame(function () { d.classList.add("is-in"); }); });
   };
   FG.closeDialog = function (d) {
     if (!d.open) return;
     d.classList.remove("is-in");
     var done = false;
-    function fin() { if (done) return; done = true; d.close(); }
+    function fin() { if (done) return; done = true; if (typeof d.close === "function") d.close(); else d.removeAttribute("open"); }
     d.addEventListener("transitionend", fin, { once: true });
     setTimeout(fin, 260);
   };
@@ -122,10 +122,10 @@
   function headerHTML() {
     var navD = FG.MENU.map(function (m) {
       var c = FG.CATS[m.cat];
-      return '<li class="nav-item"><a class="nav-top" href="catalogo.html?cat=' + m.cat + '" data-cat="' + m.cat + '">' + c.name + '</a><div class="mega"><div class="mega-in container">' +
+      return '<li class="nav-item"><button type="button" class="nav-top" aria-haspopup="true" aria-expanded="false" data-cat="' + m.cat + '">' + c.name + '</button><div class="mega"><div class="mega-in container">' +
         m.cols.map(function (col) { return '<div><h3>' + col.t + '</h3><ul>' + col.links.map(function (l) { return '<li><a href="' + l[1] + '">' + l[0] + '</a></li>'; }).join("") + '</ul></div>'; }).join("") +
         (function () { var f = FG.product(m.feat); return f ? '<a class="mega-feat" href="' + (f.href || "producto.html?id=" + f.id) + '"><div class="fa">' + FG.productArt(f) + '</div><span>' + esc(FG.lineName(f)) + '</span></a>' : ""; })() + '</div></div></li>';
-    }).join("") + '<li class="nav-item"><a class="nav-top" href="todos.html" data-cat="todos">Todos los productos</a></li>';
+    }).join("");
     var navM = FG.MENU.map(function (m) {
       return '<details><summary>' + FG.CATS[m.cat].name + '</summary>' + m.cols.map(function (col) { return '<p class="mn-t">' + col.t + '</p>' + col.links.map(function (l) { return '<a href="' + l[1] + '">' + l[0] + '</a>'; }).join(""); }).join("") + '</details>';
     }).join("");
@@ -143,7 +143,7 @@
       '<a class="icon-btn has-badge hide-xs" href="cuenta.html#favoritos" aria-label="Favoritos">' + FG.icon("heart") + '<span class="count" id="fav-count" hidden></span></a>' +
       '<a class="icon-btn has-badge" href="carrito.html" aria-label="Carrito">' + FG.icon("bag") + '<span class="count" id="cart-count"></span></a></div></div></header>' +
       '<div class="mnav-wrap" id="mnav-wrap" hidden><div class="mnav-back" data-mclose></div><aside class="mnav" aria-label="Menú"><div class="mnav-head"><span class="logo-text">Menú</span><button class="icon-btn" data-mclose aria-label="Cerrar menú">' + FG.icon("close") + '</button></div>' + navM +
-      '<div class="mn-links"><a href="todos.html">Todos los productos</a>' + (FG.session && FG.session.get() ? '<a href="cuenta.html">Mi cuenta</a>' : '<a href="cuenta.html#entrar">Iniciar sesión</a><a href="cuenta.html#registro">Registrarse</a>') + '<a href="cuenta.html#favoritos">Favoritos</a><a href="devoluciones.html">Devoluciones y garantía</a><a href="empresas.html">Empresas</a></div></aside></div>' +
+      '<div class="mn-links">' + (FG.session && FG.session.get() ? '<a href="cuenta.html">Mi cuenta</a>' : '<a href="cuenta.html#entrar">Iniciar sesión</a><a href="cuenta.html#registro">Registrarse</a>') + '<a href="cuenta.html#favoritos">Favoritos</a><a href="devoluciones.html">Devoluciones y garantía</a><a href="empresas.html">Empresas</a></div></aside></div>' +
       '<dialog class="search-dlg" id="search-dlg" aria-label="Buscar"><form class="search-form" role="search"><span class="s-ico">' + FG.icon("search") + '</span><input id="search-in" type="search" placeholder="Busca maletas, accesorios…" autocomplete="off" enterkeyhint="search" aria-label="Buscar productos"><button type="button" class="icon-btn" data-close aria-label="Cerrar">' + FG.icon("close") + '</button></form><div class="search-sugg" id="search-sugg"><span>Populares:</span>' + ["Cabin", "Batería", "Candado TSA", "Funda", "Mochila"].map(function (t) { return '<button type="button" data-sugg="' + t + '">' + t + '</button>'; }).join("") + '</div><ul class="search-res" id="search-res"></ul></dialog>' +
       '<dialog class="drawer" id="drawer" aria-label="Carrito"><div class="drawer-inner"></div></dialog><div id="toasts" aria-live="polite"></div>';
   }
@@ -156,7 +156,7 @@
       '<div class="trust-it"><span class="ic">' + FG.icon("check").replace('<path d="M5 12.5l4.5 4.5L19 7.5"/>', '<path d="M12 3l7 3v5c0 4.500-3 8-7 10-4-2-7-5.500-7-10V6z"/><path d="M9 12l2 2 4-4"/>') + '</span><div><h3>Garantía de 3 años</h3><p>Cubre la batería de movimiento y el sistema Follow Me.</p></div></div>' +
       '</div></section>' +
       '<footer class="site-footer"><div class="container foot-grid">' +
-      '<div><h4>Comprar</h4><ul>' + Object.keys(FG.CATS).map(function (k) { return '<li><a href="catalogo.html?cat=' + k + '">' + FG.CATS[k].name + '</a></li>'; }).join("") + '<li><a href="todos.html">Todos los productos</a></li></ul></div>' +
+      '<div><h4>Comprar</h4><ul>' + Object.keys(FG.CATS).map(function (k) { return '<li><a href="catalogo.html?cat=' + k + '">' + FG.CATS[k].name + '</a></li>'; }).join("") + '</ul></div>' +
       '<div><h4>Asistencia</h4><ul><li><a href="cuenta.html">Mi cuenta</a></li><li><a href="devoluciones.html">Devoluciones y garantía</a></li><li><a href="index.html#faq">Preguntas frecuentes</a></li><li><a href="empresas.html">Empresas</a></li></ul></div>' +
       '<div><h4>La empresa</h4><ul><li><a href="sobre-nosotros.html">Sobre nosotros</a></li><li><a href="index.html#baterias">Cómo funcionan las baterías</a></li><li><a href="index.html#club">Club FindGo</a></li></ul></div>' +
       '<div><h4>Legal</h4><ul><li><a href="privacidad.html">Política de privacidad</a></li><li><a href="cookies.html">Política de cookies</a></li><li><a href="terminos.html">Términos y condiciones</a></li></ul></div>' +
@@ -183,8 +183,30 @@
     // Navegación actual
     var q = new URLSearchParams(location.search), cat = q.get("cat");
     if (!cat && q.get("id")) { var pp = FG.product(q.get("id")); if (pp) cat = pp.cat; }
-    if (document.body.dataset.all) cat = "todos";
     if (cat) { var a = document.querySelector('.nav-top[data-cat="' + cat + '"]'); if (a) a.setAttribute("aria-current", "page"); }
+
+    // Menú principal: cada categoría abre su desplegable; los textos empiezan donde empieza la palabra
+    var items = [].slice.call(document.querySelectorAll(".main-nav .nav-item"));
+    function align(it) {
+      var top = it.querySelector(".nav-top"), mi = it.querySelector(".mega-in"); if (!top || !mi) return;
+      mi.style.paddingLeft = "";
+      var x = top.getBoundingClientRect().left + parseFloat(getComputedStyle(top).paddingLeft) - mi.getBoundingClientRect().left;
+      var min = parseFloat(getComputedStyle(mi).paddingLeft);
+      if (x <= min) return;
+      mi.style.paddingLeft = x + "px";
+      // Si no cabe junto a la imagen destacada, se acerca a la izquierda lo justo
+      var over = mi.scrollWidth - mi.clientWidth; if (over > 0) mi.style.paddingLeft = Math.max(min, x - over) + "px";
+    }
+    function closeAll(except) { items.forEach(function (it) { if (it !== except) { it.classList.remove("open"); var b = it.querySelector(".nav-top"); if (b) b.setAttribute("aria-expanded", "false"); } }); }
+    items.forEach(function (it) {
+      var b = it.querySelector(".nav-top");
+      it.addEventListener("mouseenter", function () { align(it); });
+      it.addEventListener("focusin", function () { align(it); });
+      b.addEventListener("click", function (e) { e.stopPropagation(); var on = !it.classList.contains("open"); closeAll(it); align(it); it.classList.toggle("open", on); b.setAttribute("aria-expanded", on); });
+    });
+    document.addEventListener("click", function (e) { if (!e.target.closest(".main-nav")) closeAll(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") { var o = document.querySelector(".nav-item.open"); closeAll(); if (o) o.querySelector(".nav-top").focus(); } });
+    window.addEventListener("resize", function () { var o = document.querySelector(".nav-item.open"); if (o) align(o); });
 
     // Menú móvil
     var wrap = document.getElementById("mnav-wrap"), burger = document.getElementById("burger");

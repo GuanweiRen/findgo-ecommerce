@@ -2,20 +2,28 @@
 (function () {
   var FG = window.FG = window.FG || {};
 
-  var mem = {};
+  /* Si el navegador bloquea localStorage (p. ej. Chrome con «Bloquear datos de sitios» o el modo
+     de algunos antivirus), los datos se guardan en memoria y en window.name, que se conserva al
+     cambiar de página en la misma pestaña. Así el carrito y el pago siguen funcionando. */
+  var LS = (function () { try { var k = "fg:__test"; window.localStorage.setItem(k, "1"); window.localStorage.removeItem(k); return window.localStorage; } catch (e) { return null; } })();
+  var mem = (function () { try { var o = JSON.parse(window.name || "{}"); return o && o.__fg ? o.d : {}; } catch (e) { return {}; } })();
+  var NO_NAME = { profile: 1, session: 1, accounts: 1 };  // datos personales: solo en memoria
+  function keepInName() { try { var d = {}; for (var k in mem) if (!NO_NAME[k]) d[k] = mem[k]; window.name = JSON.stringify({ __fg: 1, d: d }); } catch (e) {} }
+  function valid(v, fallback) { return Array.isArray(fallback) && !Array.isArray(v) ? fallback : v; }
   function read(key, fallback) {
-    try {
-      var v = localStorage.getItem("fg:" + key); if (!v) return fallback;
-      v = JSON.parse(v);
-      if (Array.isArray(fallback) && !Array.isArray(v)) return fallback;
-      return v;
-    } catch (e) { return key in mem ? mem[key] : fallback; }
+    if (LS) {
+      try { var v = LS.getItem("fg:" + key); return v ? valid(JSON.parse(v), fallback) : fallback; }
+      catch (e) { if (!(key in mem)) return fallback; }
+    }
+    return key in mem && mem[key] != null ? valid(mem[key], fallback) : fallback;
   }
   function write(key, val) {
     mem[key] = val;
-    try { localStorage.setItem("fg:" + key, JSON.stringify(val)); } catch (e) {}
-    document.dispatchEvent(new CustomEvent("fg:change", { detail: key }));
+    if (LS) { try { LS.setItem("fg:" + key, JSON.stringify(val)); } catch (e) { LS = null; } }
+    if (!LS) keepInName();
+    try { document.dispatchEvent(new CustomEvent("fg:change", { detail: key })); } catch (e) {}
   }
+  FG.remove = function (key) { delete mem[key]; if (LS) { try { LS.removeItem("fg:" + key); } catch (e) {} } else keepInName(); };
   FG.read = read; FG.write = write;
 
   FG.esc = function (s) {

@@ -603,3 +603,10 @@ body[data-page="checkout"] .h-right { grid-column: 3; justify-self: end; }
   .cat-layout.no-filters { grid-template-columns: minmax(0, 1fr); }
   .cat-layout.no-filters .cat-main { grid-column: 1; }
 }
+
+/* Menú: las categorías son botones que abren el desplegable */
+button.nav-top { background: none; border: 0; margin: 0; font-family: inherit; cursor: pointer; border-radius: 0; }
+.nav-item.open .mega { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
+.nav-item.open .nav-top::after { transform: scaleX(1); }
+
+.mega-in > div { flex: none; }
