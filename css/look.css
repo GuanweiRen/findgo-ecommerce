@@ -610,3 +610,11 @@ button.nav-top { background: none; border: 0; margin: 0; font-family: inherit; c
 .nav-item.open .nav-top::after { transform: scaleX(1); }
 
 .mega-in > div { flex: none; }
+
+/* Una sola barra de desplazamiento: la ficha y los filtros ya no tienen scroll propio */
+@media (min-width: 861px) {
+  .pinfo { position: static; max-height: none; overflow: visible; }
+}
+@media (min-width: 960px) {
+  .filters, .cat-layout .filters { position: static; max-height: none; overflow: visible; }
+}
