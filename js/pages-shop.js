@@ -433,10 +433,15 @@
       // Se muestran 3 y el resto con «Ver todas las opiniones»
       $("#rev-list").innerHTML = mine.slice(0, 3).map(revHTML).join("");
       if (mine.length > 3) {
-        var more = document.createElement("button"); more.type = "button"; more.className = "btn btn-ghost"; more.style.marginTop = "18px";
-        more.textContent = "Ver todas las opiniones (" + mine.length + ")";
-        more.addEventListener("click", function () { $("#rev-list").innerHTML = mine.map(revHTML).join(""); more.remove(); });
-        $("#rev-list").insertAdjacentElement("afterend", more);
+        // Se cargan de 10 en 10
+        var shown = 3, more = document.createElement("button"); more.type = "button"; more.className = "btn btn-ghost"; more.style.marginTop = "18px";
+        var label = function () { more.textContent = "Ver más opiniones (" + shown + " de " + mine.length + ")"; };
+        more.addEventListener("click", function () {
+          var next = mine.slice(shown, shown + 10); shown += next.length;
+          $("#rev-list").insertAdjacentHTML("beforeend", next.map(revHTML).join(""));
+          if (shown >= mine.length) more.remove(); else label();
+        });
+        label(); $("#rev-list").insertAdjacentElement("afterend", more);
       }
     }
     var rel = FG.upsell(4);

@@ -212,6 +212,26 @@
     { n: "Fernando C.", r: 5, t: "Cabe bajo el asiento", x: "Perfecta para vuelos baratos: ni un euro de más en equipaje.", p: "underseat" },
     { n: "Lucía G.", r: 5, t: "Dormí todo el vuelo", x: "Se adapta bien al cuello y se guarda en nada.", p: "almohada" }
   ];
+  /* Más opiniones de maletas, generadas con un generador fijo (siempre salen las mismas) */
+  (function () {
+    var seed = 7;
+    function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+    function pick(a) { return a[Math.floor(rnd() * a.length)]; }
+    var NAMES = ["Laura", "Carlos", "Marta", "David", "Ana", "Javier", "Lucía", "Pablo", "Sara", "Daniel", "Elena", "Miguel", "Carmen", "Adrián", "Paula", "Álvaro", "Cristina", "Raúl", "Andrea", "Jorge", "Isabel", "Sergio", "Patricia", "Alejandro", "Rocío", "Manuel", "Teresa", "Iván", "Silvia", "Rubén", "Alba", "Fernando", "Noelia", "Gonzalo", "Inés", "Víctor", "Julia", "Marcos", "Eva", "Héctor", "Claudia", "Mario", "Sofía", "Guillermo", "Irene", "Diego", "Nerea", "Roberto", "Lorena", "Antonio"];
+    var LETTERS = "ABCDEFGHIJLMNOPRSTVZ";
+    var TITLES = ["Encantada con la compra", "Una maravilla", "La mejor maleta que he tenido", "Muy recomendable", "Merece cada euro", "Viajar así da gusto", "Me ha cambiado los viajes", "Calidad excelente", "Cómoda y resistente", "Justo lo que buscaba", "Repetiría sin dudarlo", "Un acierto total", "Diseño precioso", "Funciona de maravilla", "Tranquilidad absoluta", "Perfecta para volar", "Llega todo impecable", "Superó mis expectativas", "Muy bien pensada", "Cinco estrellas"];
+    var TEXTS = ["La he usado en varios viajes y sigue como nueva.", "Ver en la app dónde está la maleta da muchísima tranquilidad.", "El Follow Me es increíble: caminas con las manos libres por el aeropuerto.", "Las ruedas giran suaves y no hace nada de ruido.", "La batería se saca en un segundo y en el control no hubo ningún problema.", "En la cinta la reconozco al momento por el color.", "El acabado es de mucha calidad y se limpia muy fácil.", "Me llegó antes de lo previsto y muy bien protegida.", "Las iniciales grabadas le dan un toque muy personal.", "Por dentro está muy bien organizada y cabe más de lo que parece.", "Mis amigos me preguntan siempre dónde la he comprado.", "La app avisa cuando la maleta se aleja, genial para estaciones y hoteles.", "Cargar el móvil con la batería en la sala de embarque es comodísimo.", "Ligera para lo resistente que es.", "La atención al cliente me resolvió una duda en minutos.", "Ha aguantado vuelos con escala sin un rasguño.", "Es la tercera que compro para la familia.", "El asa telescópica es muy firme y cómoda.", "Facturarla fue rapidísimo gracias a la batería extraíble.", "No vuelvo a viajar con otra maleta."];
+    var LITE = ["Ligera y con GPS, no necesito nada más.", "Para escapadas cortas es perfecta.", "Pesa poquísimo y cabe en cabina sin problemas.", "Saber dónde está siempre me da mucha tranquilidad.", "Muy buena relación calidad-precio.", "Se factura tal cual, sin quitar nada.", "Bonita, resistente y muy fácil de llevar."];
+    var COUNTS = { cabin: 214, medium: 156, large: 98, lite: 187, "cabin-limited": 23 };
+    Object.keys(COUNTS).forEach(function (id) {
+      var have = REVIEWS.filter(function (r) { return r.p === id; }).length;
+      for (var i = have; i < COUNTS[id]; i++) {
+        var txt = id === "lite" ? pick(LITE) + " " + pick(LITE) : pick(TEXTS) + " " + pick(TEXTS);
+        REVIEWS.push({ n: pick(NAMES) + " " + LETTERS.charAt(Math.floor(rnd() * LETTERS.length)) + ".", r: rnd() < .9 ? 5 : 4, t: pick(TITLES), x: txt.split(" ").length > 4 && txt.indexOf(". ") > -1 && txt.split(". ")[0] + "." === txt.split(". ")[1] ? txt.split(". ")[0] + "." : txt, p: id });
+      }
+    });
+  })();
+
   // La valoración y el número de opiniones salen solo de las opiniones que existen
   P.forEach(function (p) {
     var mine = REVIEWS.filter(function (r) { return r.p === p.id; });
