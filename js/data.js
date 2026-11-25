@@ -12,7 +12,7 @@
     bosque:    { name: "Verde bosque", hex: "#1f4d3a" },
     rojo:      { name: "Rojo",        hex: "#c8102e" }
   };
-  var SUIT = ["grafito", "arena", "azul", "salvia", "hielo", "coral", "negro"];
+  var SUIT = ["grafito", "arena", "azul", "salvia", "hielo", "coral", "negro", "rojo"];
   var BAG = ["grafito", "arena", "azul", "salvia", "hielo", "coral", "negro"];
 
   var CATS = {
@@ -79,7 +79,7 @@
     // PERSONALIZACION
     { id: "p-iniciales", cat: "personalizacion", name: "Iniciales grabadas", price: 19, kind: "engrave", size: "-", func: "grabado", trip: "-", nonReturnable: true, initials: true, needsInitials: true,
       short: "Hasta 3 letras grabadas en la maleta.", desc: "Grabado láser de hasta tres iniciales. Al ser un producto personalizado no admite devolución salvo defecto (art. 103 TRLGDCU)." },
-    { id: "p-asas", cat: "personalizacion", name: "Asas y ruedas de color", price: 25, kind: "wheel", size: "-", func: "color", trip: "-", colors: SUIT.concat("cuero", "rojo"),
+    { id: "p-asas", cat: "personalizacion", name: "Asas y ruedas de color", price: 25, kind: "wheel", size: "-", func: "color", trip: "-", colors: SUIT.concat("cuero"),
       short: "Cambia el color de asas y ruedas.", desc: "Kit de asas y ruedas en el color que elijas, para que tu maleta sea fácil de reconocer en la cinta." },
     { id: "p-funda-diseno", cat: "personalizacion", name: "Funda con tu diseño", price: 45, kind: "cover", size: "-", func: "funda", trip: "-", nonReturnable: true,
       short: "Sube tu imagen y la imprimimos.", desc: "Funda protectora impresa con la imagen que tú elijas. Producto personalizado: no admite devolución salvo defecto (art. 103 TRLGDCU)." },
