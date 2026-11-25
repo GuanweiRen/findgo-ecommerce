@@ -249,7 +249,8 @@
       var chips = "";
       if (st.q) chips += '<button class="chip" data-clear="q">Búsqueda: «' + esc(st.q) + '» ✕</button>';
       active().forEach(function (k) { chips += '<button class="chip" data-clear="' + k + '">' + (k === "fm" ? "" : NAMES[k] ? NAMES[k] + ": " : k === "price" ? "Precio: " : "") + esc(labelOf(k)) + ' ✕</button>'; });
-      $("#chips").innerHTML = chips ? chips + '<button class="chip chip-clear" data-clear="all">Limpiar todo</button>' : "";
+      // «Limpiar todo» solo aparece si se ha cambiado algún filtro (la búsqueda sola no cuenta)
+      $("#chips").innerHTML = chips + (active().length ? '<button class="chip chip-clear" data-clear="all">Limpiar todo</button>' : "");
       var cards = cardList;
       $("#grid").innerHTML = list.length ? cards.join("") : !base.length && st.q
         ? '<div class="empty" style="grid-column:1/-1"><h3>No encontramos «' + esc(st.q) + '»</h3><p>Prueba con ' + FG.SEARCH_SUGG.map(function (x) { return '<a class="link-u" href="catalogo.html?q=' + encodeURIComponent(x) + '">' + esc(x) + '</a>'; }).join(", ") + '.</p><a class="btn btn-primary" href="catalogo.html">Ver todo el catálogo</a></div>'
