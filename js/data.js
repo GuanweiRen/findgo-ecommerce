@@ -15,7 +15,7 @@
 
   var CATS = {
     maletas:         { name: "Maletas",         desc: "Maletas inteligentes que te siguen y se localizan solas." },
-    equipaje:        { name: "Packs",           desc: "Packs, mochilas, bolsas y más para cada tipo de viaje." },
+    equipaje:        { name: "Bolsas y packs",  desc: "Packs, mochilas, bolsas y más para cada tipo de viaje." },
     personalizacion: { name: "Personalización", desc: "Hazla tuya: iniciales, colores y diseños propios." },
     accesorios:      { name: "Accesorios",      desc: "Baterías, cargadores, fundas y pequeños imprescindibles." },
     servicios:       { name: "Servicios",       desc: "Garantía, app Premium, reparación y soluciones para empresas." }
@@ -33,16 +33,16 @@
   var P = [
     // MALETAS
     { id: "cabin", cat: "maletas", name: "FindGo Cabin 55 cm", price: 349, kind: "suitcase", scale: .78, size: "cabina", func: "maleta", trip: "escapada",
-      short: "La de cabina: Follow Me, localización y power bank.", colors: SUIT, initials: true, followMe: true, litres: "38 L", weight: "3,9 kg", rating: 4.8, reviews: 214, tag: "Más vendida",
+      short: "La de cabina: Follow Me, localización y power bank.", colors: SUIT, initials: true, followMe: true, litres: "38 L", weight: "3,9 kg", tag: "Más vendida",
       desc: "Cabe en cabina en casi todas las aerolíneas. Te sigue por el aeropuerto, la ves en el mapa aunque esté facturada y su batería extraíble carga tu móvil.", spec: SPEC_MOVE },
     { id: "medium", cat: "maletas", name: "FindGo Medium 65 cm", price: 399, kind: "suitcase", scale: .9, size: "mediano", func: "maleta", trip: "largo",
-      short: "Para semanas fuera. Tres ideas clave en un solo cuerpo.", colors: SUIT, initials: true, followMe: true, litres: "65 L", weight: "4,6 kg", rating: 4.7, reviews: 156,
+      short: "Para semanas fuera. Tres ideas clave en un solo cuerpo.", colors: SUIT, initials: true, followMe: true, litres: "65 L", weight: "4,6 kg",
       desc: "El tamaño ideal para una semana o dos. Misma tecnología que la Cabin con más capacidad.", spec: SPEC_MOVE },
     { id: "large", cat: "maletas", name: "FindGo Large 75 cm", price: 449, kind: "suitcase", scale: 1, size: "grande", func: "maleta", trip: "familia",
-      short: "Máxima capacidad para viajes largos o en familia.", colors: SUIT, initials: true, followMe: true, litres: "92 L", weight: "5,3 kg", rating: 4.7, reviews: 98,
+      short: "Máxima capacidad para viajes largos o en familia.", colors: SUIT, initials: true, followMe: true, litres: "92 L", weight: "5,3 kg",
       desc: "La más grande de la gama. Pensada para viajes largos o para repartir equipaje entre varias personas.", spec: SPEC_MOVE },
     { id: "lite", cat: "maletas", name: "FindGo Lite 55 cm", price: 229, kind: "suitcase", scale: .78, size: "cabina", func: "maleta", trip: "escapada",
-      short: "Solo GPS: sin Follow Me, sin batería extraíble.", colors: SUIT, initials: true, followMe: false, litres: "38 L", weight: "3,1 kg", rating: 4.5, reviews: 187, tag: "Solo GPS",
+      short: "Solo GPS: sin Follow Me, sin batería extraíble.", colors: SUIT, initials: true, followMe: false, litres: "38 L", weight: "3,1 kg", tag: "Solo GPS",
       desc: "La opción más ligera y económica. Incluye el módulo localizador con pila de botón fija, pero no lleva Follow Me ni batería de movimiento, así que puede facturarse tal cual.",
       spec: [["Follow Me", "No incluido"], ["Módulo localizador", "Pila de botón fija, activo durante meses"], ["Batería extraíble", "No lleva: se factura sin retirar nada"], ["Peso", "3,1 kg"]] },
 
@@ -112,7 +112,7 @@
       { t: "Descubre", links: [["Todas las maletas", "catalogo.html?cat=maletas"], ["Cómo funciona Follow Me", "index.html#follow-me"], ["Las dos baterías", "index.html#baterias"]] }
     ]},
     { cat: "equipaje", feat: "pack-viaje", cols: [
-      { t: "Por tamaño", links: [["Pequeño", "catalogo.html?cat=equipaje&size=pequeno"], ["Mediano", "catalogo.html?cat=equipaje&size=mediano"], ["Packs", "catalogo.html?cat=equipaje&size=pack"]] },
+      { t: "Por tamaño", links: [["Pequeño", "catalogo.html?cat=equipaje&size=pequeno"], ["Mediano", "catalogo.html?cat=equipaje&size=mediano"]] },
       { t: "Por función", links: [["Packs", "catalogo.html?cat=equipaje&func=pack"], ["Mochilas", "catalogo.html?cat=equipaje&func=mochila"], ["Bolsas", "catalogo.html?cat=equipaje&func=bolsa"], ["Trabajo", "catalogo.html?cat=equipaje&func=trabajo"]] },
       { t: "Por tipo de viaje", links: [["Escapada", "catalogo.html?cat=equipaje&trip=escapada"], ["Negocios", "catalogo.html?cat=equipaje&trip=negocios"], ["Familia", "catalogo.html?cat=equipaje&trip=familia"], ["Viaje largo", "catalogo.html?cat=equipaje&trip=largo"]] }
     ]},
@@ -154,6 +154,11 @@
     { n: "Carlos M.", r: 5, t: "Viajamos cuatro con las tres tallas", x: "Pedimos el Pack Familia en el mismo color y así no nos confundimos en la cinta.", p: "large" },
     { n: "Elena S.", r: 4, t: "Buena relación calidad-precio", x: "Compré la Lite solo por el localizador. Pesa poco y cumple su función.", p: "lite" }
   ];
+  // La valoración y el número de opiniones salen solo de las opiniones que existen
+  P.forEach(function (p) {
+    var mine = REVIEWS.filter(function (r) { return r.p === p.id; });
+    if (mine.length) { p.reviews = mine.length; p.rating = Math.round(mine.reduce(function (a, r) { return a + r.r; }, 0) / mine.length * 10) / 10; }
+  });
   var FAQ = [
     ["¿Puedo facturar la maleta con batería?", "Sí, pero la batería de movimiento (98 Wh) se saca con un clic desde fuera y viaja contigo en cabina, como exigen las aerolíneas (norma IATA). El módulo localizador lleva una pila de botón fija, permitida en bodega, y sigue activo."],
     ["¿Cuánto dura el Follow Me?", "El objetivo de diseño es de 3 a 4 horas de seguimiento por carga. La app te avisa al 20 % y recuerda sacar la batería al llegar al aeropuerto."],

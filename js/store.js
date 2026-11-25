@@ -190,10 +190,83 @@
       '<div class="sum-row"><span>Envío ' + (o.shipping === "express" ? "express" : "estándar") + '</span><span>' + (t.ship ? FG.eur(t.ship) : "Gratis") + '</span></div>' + FG.adjHTML(t) + '<div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div>' + FG.taxHTML(t, o.address && o.address.country);
   };
 
-  function addDays(n) { var d = new Date(), k = 0; while (k < n) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) k++; } return d; }
+  function addDays(n, from) { var d = from ? new Date(from) : new Date(), k = 0; while (k < n) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) k++; } return d; }
   function fmtDay(d) { return d.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" }).replace(".", ""); }
-  FG.deliveryText = function (days) { days = days || [3, 5]; return fmtDay(addDays(days[0])) + " y " + fmtDay(addDays(days[1])); };
+  FG.deliveryText = function (days, from) { days = days || [3, 5]; return fmtDay(addDays(days[0], from)) + " y " + fmtDay(addDays(days[1], from)); };
 
+
+  /* ---------- Buscador: palabras sueltas, sinónimos, erratas y relevancia ---------- */
+  (function () {
+    function norm(s) { return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/follow[\s-]*me/g, "followme").replace(/[^a-z0-9ñ]+/g, " ").trim(); }
+    var STOP = "de del la las el los lo un una unos unas y e o u a al en con sin para por que mi mis tu tus su sus me se es".split(" ");
+    // Frases que se sustituyen antes de dividir en palabras
+    var PHRASES = [[/equipaje de mano/g, "cabin"], [/air ?tags?/g, "tag localizador"]];
+    // Cada palabra también vale por estas otras
+    var SYN = { grande: ["large"], grandes: ["large"], mediana: ["medium"], mediano: ["medium"], medianas: ["medium"], cabina: ["cabin"], regalo: ["personalizacion"], regalos: ["personalizacion"] };
+    var SIZES = ["cabin", "medium", "large"];
+    // Frases que dicen que el producto NO tiene algo: no deben contar como coincidencia
+    function clean(t) { return t.replace(/\b(sin|ni|no lleva|no incluye|no tiene) followme\b/g, " "); }
+    function fields(p) {
+      var specs = (p.spec || []).filter(function (r) { return !/^no\b/i.test(r[1]); }).map(function (r) { return r[0] + " " + r[1]; }).join(" ");
+      return [
+        [norm(p.name) + (p.followMe ? " followme" : ""), 10],
+        [norm(FG.CATS[p.cat] ? FG.CATS[p.cat].name : ""), 5],
+        [norm([p.size, p.func, p.litres, p.dims, (p.variants || []).map(function (v) { return v.n; }).join(" ")].join(" ")), 4],
+        [clean(norm(p.short + " " + p.tag)), 3],
+        [clean(norm(p.desc + " " + specs + " " + (p.who || ""))), 1]
+      ];
+    }
+    function lev(a, b, max) {
+      if (Math.abs(a.length - b.length) > max) return max + 1;
+      var prev = [], cur, i, j;
+      for (j = 0; j <= b.length; j++) prev[j] = j;
+      for (i = 1; i <= a.length; i++) {
+        cur = [i]; var best = i;
+        for (j = 1; j <= b.length; j++) { cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); if (cur[j] < best) best = cur[j]; }
+        if (best > max) return max + 1;
+        prev = cur;
+      }
+      return prev[b.length];
+    }
+    // Puntuación de una palabra (con sus alternativas) en un texto; 0 si no aparece
+    function hit(alts, text) {
+      var words = text.split(" "), i, k, w;
+      for (k = 0; k < alts.length; k++) { w = alts[k]; if ((" " + text).indexOf(" " + w) > -1) return 1; if (text.indexOf(w) > -1) return .6; }
+      if (alts.strict) return 0;
+      for (k = 0; k < alts.length; k++) {
+        w = alts[k]; if (w.length < 4) continue;
+        var max = w.length >= 8 ? 2 : 1;
+        for (i = 0; i < words.length; i++) if (words[i].length >= 3 && lev(w, words[i], max) <= max) return .5;
+      }
+      return 0;
+    }
+    FG.searchTerms = function (q) {
+      var t = norm(q); PHRASES.forEach(function (r) { t = t.replace(r[0], r[1]); });
+      return t.split(" ").filter(function (w) { return w && STOP.indexOf(w) < 0; }).map(function (w) {
+        var alts = [w].concat(SYN[w] || []);
+        if (w.length > 4 && /s$/.test(w)) alts.push(w.slice(0, -1));
+        // Tallas: solo cuentan en nombre, categoría y tamaño (no en «la batería viaja en cabina»)
+        alts.strict = alts.some(function (a) { return SIZES.indexOf(a) > -1; });
+        return alts;
+      });
+    };
+    /* Devuelve los productos que contienen todas las palabras, de más a menos relevante */
+    FG.search = function (q, list) {
+      var terms = FG.searchTerms(q); list = list || FG.PRODUCTS;
+      if (!terms.length) return [];
+      return list.map(function (p, idx) {
+        var f = fields(p), score = 0;
+        for (var i = 0; i < terms.length; i++) {
+          var best = 0;
+          for (var j = 0; j < f.length; j++) { if (terms[i].strict && f[j][1] < 4) continue; var h = hit(terms[i], f[j][0]); if (h * f[j][1] > best) best = h * f[j][1]; }
+          if (!best) return null;
+          score += best;
+        }
+        return { p: p, s: score, i: idx };
+      }).filter(Boolean).sort(function (a, b) { return b.s - a.s || a.i - b.i; }).map(function (r) { return r.p; });
+    };
+    FG.SEARCH_SUGG = ["Cabin", "Maleta grande", "Batería", "Mochila", "Candado TSA", "Regalo"];
+  })();
 
   FG.colorName = function (k) { return FG.COLORS[k] ? FG.COLORS[k].name : ""; };
 })();

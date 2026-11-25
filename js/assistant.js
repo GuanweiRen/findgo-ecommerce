@@ -77,6 +77,9 @@
 
   function answer(text) {
     var q = norm(text); if (!q) return null;
+    /* Si habla de enviar o de una zona de entrega, gana la respuesta de envíos (salvo que pregunte por impuestos) */
+    var ship = /\benvi(o|os|ar|ais|amos|an)\b/.test(q), zone = findZone(q), tax = /\b(iva|igic|ipsi|impuesto|impuestos|aduana)\b/.test(q);
+    if (ship || (zone && !tax)) { var si = I.filter(function (x) { return x.id === "envio"; })[0]; if (si) return si.a(q); }
     var best = null, bestScore = 0;
     I.forEach(function (it) {
       var sc = 0; it.k.forEach(function (k) { if ((" " + q + " ").indexOf(" " + k) > -1) sc += k.length > 4 ? 2 : 1; });
@@ -101,7 +104,7 @@
   var wrap = document.createElement("div");
   wrap.className = "bot";
   wrap.innerHTML =
-    '<button class="bot-fab" id="bot-fab" aria-expanded="false" aria-controls="bot-panel"><span class="bot-fab-ic" aria-hidden="true">' + FG.icon("chat") + '</span><span class="bot-fab-t">Pregunta a Livi</span></button>' +
+    '<button class="bot-fab" id="bot-fab" aria-label="Pregunta a Livi" aria-expanded="false" aria-controls="bot-panel"><span class="bot-fab-ic" aria-hidden="true">' + FG.icon("chat") + '</span><span class="bot-fab-t">Pregunta a Livi</span></button>' +
     '<section class="bot-panel" id="bot-panel" role="dialog" aria-label="Livi, asistente de FindGo" hidden>' +
       '<header class="bot-head"><span class="bot-ava" aria-hidden="true">L</span><div><strong>Livi</strong><small><i></i>Asistente de FindGo · responde al momento</small></div><button class="bot-x" id="bot-x" aria-label="Cerrar a Livi">' + FG.icon("close") + '</button></header>' +
       '<div class="bot-log" id="bot-log" aria-live="polite"></div>' +

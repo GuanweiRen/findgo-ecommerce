@@ -86,7 +86,7 @@
       '<button class="fav-btn' + (fav ? " on" : "") + '" data-fav="' + esc(p.id) + '" aria-pressed="' + fav + '" aria-label="' + (fav ? "Quitar de favoritos: " : "Añadir a favoritos: ") + esc(p.name) + '">' + FG.icon("heart") + '</button>' +
       '<div class="card-body"><h3 class="card-title"><a class="card-link" href="' + esc(href) + '">' + esc(FG.lineName(p)) + '</a></h3>' +
       '<p class="card-desc">' + esc(FG.cardDesc(p)) + '</p>' +
-      (p.rating ? '<div class="rate"><span class="st" aria-hidden="true">★★★★★</span><span>' + String(p.rating).replace(".", ",") + ' (' + p.reviews + ')</span></div>' : "") +
+      (p.rating ? '<div class="rate"><span class="st" aria-hidden="true">★★★★★</span><span>' + p.rating.toFixed(1).replace(".", ",") + ' (' + p.reviews + ')</span></div>' : "") +
       '<div class="card-foot"><span class="price">' + FG.priceText(p) + (p.was ? ' <s>' + FG.eur(p.was) + '</s>' : "") + '</span>' +
       (quick ? '<button class="btn btn-sm" data-quick="' + esc(p.id) + '">Añadir</button>' : "") + '</div></div></article>';
   };
@@ -113,7 +113,7 @@
       '<div class="added-item"><div class="thumb">' + FG.productArt(x.p, line.color, line.initials, line.font) + '</div><div><strong>' + esc(x.p.name) + '</strong><div class="muted small">' + (opts.join(" · ") || "&nbsp;") + '</div><div class="small"><strong>' + x.line.qty + ' × ' + FG.eur(x.unit) + '</strong></div></div></div>' +
       FG.progress(t) +
       (up.length ? '<div class="upsell"><h3>Completa tu viaje</h3>' + up.map(function (p) { return '<div class="up-row"><span class="thumb">' + FG.productArt(p) + '</span><span><strong>' + esc(p.name) + '</strong><span class="muted small">' + FG.eur(p.price) + '</span></span><button class="btn btn-sm" data-quick="' + esc(p.id) + '">Añadir</button></div>'; }).join("") + '</div>' : "") +
-      '<div class="drawer-actions"><a class="btn btn-primary btn-lg" href="carrito.html">Ver carrito y pagar (' + FG.cart.count() + ')</a><button class="btn btn-ghost" data-close>Seguir comprando</button></div>';
+      '<div class="drawer-actions"><a class="btn btn-primary btn-lg" href="checkout.html">Tramitar pedido</a><a class="btn btn-lg" href="carrito.html">Ver carrito (' + FG.cart.count() + ')</a><button class="btn btn-ghost" data-close>Seguir comprando</button></div>';
     FG.openDialog(d);
   };
 
@@ -122,7 +122,7 @@
     var navD = FG.MENU.map(function (m) {
       var c = FG.CATS[m.cat];
       return '<li class="nav-item"><a class="nav-top" href="catalogo.html?cat=' + m.cat + '" data-cat="' + m.cat + '">' + c.name + '</a><div class="mega"><div class="mega-in container">' +
-        m.cols.map(function (col) { return '<div><h4>' + col.t + '</h4><ul>' + col.links.map(function (l) { return '<li><a href="' + l[1] + '">' + l[0] + '</a></li>'; }).join("") + '</ul></div>'; }).join("") +
+        m.cols.map(function (col) { return '<div><h3>' + col.t + '</h3><ul>' + col.links.map(function (l) { return '<li><a href="' + l[1] + '">' + l[0] + '</a></li>'; }).join("") + '</ul></div>'; }).join("") +
         (function () { var f = FG.product(m.feat); return f ? '<a class="mega-feat" href="' + (f.href || "producto.html?id=" + f.id) + '"><div class="fa">' + FG.productArt(f) + '</div><span>' + esc(FG.lineName(f)) + '</span></a>' : ""; })() + '</div></div></li>';
     }).join("");
     var navM = FG.MENU.map(function (m) {
@@ -133,9 +133,9 @@
       '<div class="ann-r"><a class="ann-ship" href="devoluciones.html">' + FG.icon("pin") + '<span>Envío a España</span></a><div class="lang"><button class="lang-btn" id="lang-btn" aria-haspopup="true" aria-expanded="false" aria-label="Idioma: español"><span>ES</span>' + FG.icon("chev") + '</button><div class="lang-pop" id="lang-pop" hidden><button class="on" disabled>Español</button><button disabled>English <small>próximamente</small></button></div></div></div><button class="ann-x" id="ann-x" aria-label="Cerrar el aviso">' + FG.icon("close") + '</button></div></div>') +
       '<header class="site-header"><div class="hbar">' +
       '<div class="h-left"><button class="icon-btn burger" id="burger" aria-label="Abrir menú" aria-expanded="false">' + FG.icon("menu") + '</button></div>' +
-      '<a class="logo" href="index.html" aria-label="FindGo, inicio"><img src="img/logo.png" alt="FindGo" width="90" height="40"></a>' +
+      '<a class="logo" href="index.html" aria-label="FindGo, inicio"><img src="img/logo-180.png" alt="FindGo" width="90" height="40"></a>' +
       '<nav class="main-nav" aria-label="Principal"><ul>' + navD + '</ul></nav>' +
-      '<div class="h-right"><button class="h-search" id="search-btn" data-search aria-label="Buscar"><span>Buscar</span>' + FG.icon("search") + '</button>' +
+      '<div class="h-right">' + (document.body.dataset.page === "checkout" ? '<a class="co-help" href="devoluciones.html" target="_blank" rel="noopener">Ayuda</a>' : "") + '<button class="h-search" id="search-btn" data-search aria-label="Buscar"><span>Buscar</span>' + FG.icon("search") + '</button>' +
       '<button class="icon-btn m-search" data-search aria-label="Buscar">' + FG.icon("search") + '</button>' +
       (FG.session && FG.session.get() ? '<a class="icon-btn hide-xs" href="cuenta.html" aria-label="Mi cuenta">' + FG.icon("user") + '</a>' :
         '<div class="acc-menu hide-xs"><button class="icon-btn" id="acc-btn" aria-label="Cuenta" aria-haspopup="true" aria-expanded="false">' + FG.icon("user") + '</button><div class="acc-pop" id="acc-pop" hidden><p>¡Hola! Entra o crea tu cuenta para seguir tus pedidos y guardar favoritos.</p><a class="btn btn-primary btn-sm btn-block" href="cuenta.html#entrar">Iniciar sesión</a><a class="btn btn-sm btn-block" href="cuenta.html#registro">Registrarse</a></div></div>') +
@@ -149,18 +149,18 @@
 
   function footerHTML() {
     return '<section class="trust-row"><div class="container trust-in">' +
-      '<div class="trust-it"><span class="ic">' + FG.icon("truck") + '</span><div><h4>Envío gratuito</h4><p>Envío estándar gratis desde 99 €, en 3 a 5 días laborables.</p></div></div>' +
-      '<div class="trust-it"><span class="ic">' + FG.icon("close").replace('<path d="M6 6l12 12M18 6L6 18"/>', '<path d="M4 8h11a5 5 0 0 1 0 10H8"/><path d="M8 4L4 8l4 4"/>') + '</span><div><h4>Devoluciones gratuitas</h4><p>30 días para devolver, con recogida gratis en tu casa.</p></div></div>' +
-      '<div class="trust-it"><span class="ic">' + FG.icon("check") + '</span><div><h4>Pago seguro</h4><p>Pago de prueba: no se cobra nada.</p></div></div>' +
-      '<div class="trust-it"><span class="ic">' + FG.icon("check").replace('<path d="M5 12.5l4.5 4.5L19 7.5"/>', '<path d="M12 3l7 3v5c0 4.500-3 8-7 10-4-2-7-5.500-7-10V6z"/><path d="M9 12l2 2 4-4"/>') + '</span><div><h4>Garantía de 3 años</h4><p>Cubre la batería de movimiento y el sistema Follow Me.</p></div></div>' +
+      '<div class="trust-it"><span class="ic">' + FG.icon("truck") + '</span><div><h3>Envío gratuito</h3><p>Envío estándar gratis desde 99 €, en 3 a 5 días laborables.</p></div></div>' +
+      '<div class="trust-it"><span class="ic">' + FG.icon("close").replace('<path d="M6 6l12 12M18 6L6 18"/>', '<path d="M4 8h11a5 5 0 0 1 0 10H8"/><path d="M8 4L4 8l4 4"/>') + '</span><div><h3>Devoluciones gratuitas</h3><p>30 días para devolver, con recogida gratis en tu casa.</p></div></div>' +
+      '<div class="trust-it"><span class="ic">' + FG.icon("check") + '</span><div><h3>Pago seguro</h3><p>Pago de prueba: no se cobra nada.</p></div></div>' +
+      '<div class="trust-it"><span class="ic">' + FG.icon("check").replace('<path d="M5 12.5l4.5 4.5L19 7.5"/>', '<path d="M12 3l7 3v5c0 4.500-3 8-7 10-4-2-7-5.500-7-10V6z"/><path d="M9 12l2 2 4-4"/>') + '</span><div><h3>Garantía de 3 años</h3><p>Cubre la batería de movimiento y el sistema Follow Me.</p></div></div>' +
       '</div></section>' +
       '<footer class="site-footer"><div class="container foot-grid">' +
       '<div><h4>Comprar</h4><ul>' + Object.keys(FG.CATS).map(function (k) { return '<li><a href="catalogo.html?cat=' + k + '">' + FG.CATS[k].name + '</a></li>'; }).join("") + '</ul></div>' +
       '<div><h4>Asistencia</h4><ul><li><a href="cuenta.html">Mi cuenta</a></li><li><a href="devoluciones.html">Devoluciones y garantía</a></li><li><a href="index.html#faq">Preguntas frecuentes</a></li><li><a href="empresas.html">Empresas</a></li></ul></div>' +
       '<div><h4>La empresa</h4><ul><li><a href="sobre-nosotros.html">Sobre nosotros</a></li><li><a href="index.html#baterias">Cómo funcionan las baterías</a></li><li><a href="index.html#club">Club FindGo</a></li></ul></div>' +
       '<div><h4>Legal</h4><ul><li><a href="privacidad.html">Política de privacidad</a></li><li><a href="cookies.html">Política de cookies</a></li><li><a href="terminos.html">Términos y condiciones</a></li></ul></div>' +
-      '</div><div class="container foot-mid"><a class="logo" href="index.html">FindGo</a><div class="social">' + ["Facebook", "Instagram", "YouTube", "TikTok", "Pinterest"].map(function (s) { return '<a href="#" data-fake aria-label="' + s + '">' + s + '</a>'; }).join("") + '</div></div>' +
-      '<div class="container foot-bottom"><span>© 2026 FindGo. Precios con IVA incluido.</span><span>Tarjeta de prueba: 4242 4242 4242 4242</span></div></footer>' +
+      '</div><div class="container foot-mid"><a class="logo" href="index.html">FindGo</a></div>' +
+      '<div class="container foot-bottom"><span>© 2026 FindGo. Precios con IVA incluido.</span></div></footer>' +
       '<div class="cookie" id="cookie" role="dialog" aria-label="Cookies" hidden><p><strong>Cookies.</strong> Usamos cookies técnicas y, si lo aceptas, de analítica para mejorar la tienda. <a href="cookies.html">Más información</a></p><div class="cookie-actions"><button class="btn btn-ghost btn-sm" data-ck="necessary">Solo necesarias</button><button class="btn btn-primary btn-sm" data-ck="all">Aceptar todas</button></div></div>' +
       '<a class="club-tab" href="index.html#club" aria-label="Únete al club">' + FG.icon("heart").replace(/<path[^>]*\/>/, '<rect x="3" y="5" width="18" height="14"/><path d="M3 7l9 7 9-7"/>') + '</a>';
   }
@@ -192,6 +192,7 @@
       burger.setAttribute("aria-expanded", v); document.body.classList.toggle("no-scroll", v);
     }
     burger.addEventListener("click", function () { mopen(true); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !wrap.hidden && wrap.classList.contains("is-in")) { mopen(false); burger.focus(); } });
     wrap.addEventListener("click", function (e) { if (e.target.closest("[data-mclose]") || e.target.closest("a")) mopen(false); });
 
     // Idioma
@@ -217,10 +218,12 @@
     function norm(s) { return String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
     function doSearch() {
       var t = norm(si.value.trim()); if (!t) { sr.innerHTML = '<li class="muted s-empty">Escribe para buscar en el catálogo.</li>'; return; }
-      var hits = FG.PRODUCTS.filter(function (p) { return norm(p.name + " " + p.short + " " + FG.CATS[p.cat].name).indexOf(t) > -1; }).slice(0, 8);
-      sr.innerHTML = hits.length ? hits.map(function (p) { return '<li><a href="' + (p.href || "producto.html?id=" + p.id) + '"><span class="thumb">' + FG.productArt(p) + '</span><span><strong>' + esc(p.name) + '</strong><small class="muted"> ' + esc(FG.CATS[p.cat].name) + '</small></span><span class="mono">' + FG.priceText(p) + '</span></a></li>'; }).join("") : '<li class="muted s-empty">Sin resultados para «' + esc(si.value.trim()) + '».</li>';
+      var all = FG.search(si.value), hits = all.slice(0, 8);
+      sr.innerHTML = hits.length ? hits.map(function (p) { return '<li><a href="' + (p.href || "producto.html?id=" + p.id) + '"><span class="thumb">' + FG.productArt(p) + '</span><span><strong>' + esc(p.name) + '</strong><small class="muted"> ' + esc(FG.CATS[p.cat].name) + '</small></span><span class="mono">' + FG.priceText(p) + '</span></a></li>'; }).join("") + (all.length > hits.length ? '<li class="s-more"><a href="catalogo.html?q=' + encodeURIComponent(si.value.trim()) + '">Ver los ' + all.length + ' resultados</a></li>' : "")
+        : '<li class="muted s-empty">Sin resultados para «' + esc(si.value.trim()) + '». Prueba con ' + FG.SEARCH_SUGG.map(function (x) { return '<button type="button" class="link-u" data-sugg="' + esc(x) + '">' + esc(x) + '</button>'; }).join(", ") + ' o <a class="link-u" href="catalogo.html">mira todo el catálogo</a>.</li>';
     }
     document.querySelectorAll("[data-search]").forEach(function (b) { b.addEventListener("click", function () { FG.openDialog(sd); si.focus(); doSearch(); }); });
+    sr.addEventListener("click", function (e) { var b = e.target.closest("[data-sugg]"); if (b) { si.value = b.dataset.sugg; doSearch(); si.focus(); } });
     document.getElementById("search-sugg").addEventListener("click", function (e) { var b = e.target.closest("[data-sugg]"); if (b) { si.value = b.dataset.sugg; doSearch(); si.focus(); } });
     si.addEventListener("input", doSearch);
     sd.querySelector("form").addEventListener("submit", function (e) { e.preventDefault(); if (si.value.trim()) location.href = "catalogo.html?q=" + encodeURIComponent(si.value.trim()); });
@@ -236,10 +239,10 @@
 
     // Cookies
     var ck = document.getElementById("cookie");
-    if (!FG.read("cookies", null)) { ck.hidden = false; requestAnimationFrame(function () { requestAnimationFrame(function () { ck.classList.add("is-in"); }); }); }
+    if (!FG.read("cookies", null)) { ck.hidden = false; document.body.classList.add("has-cookie"); requestAnimationFrame(function () { requestAnimationFrame(function () { ck.classList.add("is-in"); }); }); }
     ck.addEventListener("click", function (e) {
       var b = e.target.closest("[data-ck]"); if (!b) return;
-      FG.write("cookies", b.dataset.ck); ck.classList.remove("is-in"); setTimeout(function () { ck.hidden = true; }, 240);
+      FG.write("cookies", b.dataset.ck); ck.classList.remove("is-in"); document.body.classList.remove("has-cookie"); setTimeout(function () { ck.hidden = true; }, 240);
     });
 
     updateBadges();

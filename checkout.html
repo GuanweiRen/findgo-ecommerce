@@ -9,7 +9,7 @@
 <meta name="color-scheme" content="light">
 <link rel="icon" type="image/png" href="img/favicon.png"><link rel="apple-touch-icon" href="img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Dancing+Script:wght@600&family=Fredoka:wght@500&family=Playfair+Display:wght@600&family=Special+Elite&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
 <link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/pages.css"><link rel="stylesheet" href="css/look.css">
 </head>
 <body data-page="checkout">
@@ -24,7 +24,7 @@
 <div class="row2"><div class="field"><label for="f-name">Nombre</label><input id="f-name" name="name" autocomplete="given-name" required maxlength="60"><span class="err">Escribe tu nombre.</span></div>
 <div class="field"><label for="f-last">Apellidos</label><input id="f-last" name="last" autocomplete="family-name" required maxlength="80"><span class="err">Escribe tus apellidos.</span></div></div>
 <div class="field"><label for="f-addr">Calle y número</label><input id="f-addr" name="addr" autocomplete="street-address" required maxlength="120"><span class="err">Escribe tu dirección.</span></div>
-<div class="row2"><div class="field"><label for="f-cp">Código postal</label><input id="f-cp" name="cp" autocomplete="postal-code" maxlength="8" required><span class="err" id="f-cp-err">Debe tener 5 cifras.</span></div>
+<div class="row2"><div class="field"><label for="f-cp">Código postal</label><input id="f-cp" name="cp" inputmode="numeric" autocomplete="postal-code" maxlength="8" required><span class="err" id="f-cp-err">Debe tener 5 cifras.</span></div>
 <div class="field"><label for="f-city">Ciudad</label><input id="f-city" name="city" autocomplete="address-level2" required maxlength="60"><span class="err">Escribe tu ciudad.</span></div></div>
 <div class="field"><label for="f-country">País de entrega</label><select id="f-country" name="country" autocomplete="country"></select></div>
 <p class="lbl" style="font-weight:600;margin:6px 0 10px">Método de envío</p><div id="ship-opts"></div></section>
@@ -43,7 +43,7 @@
 <div class="pay-panel" data-pay="googlepay" hidden><p class="pay-note"><strong>Pago de prueba.</strong> No se cobra nada.</p></div>
 <div class="pay-panel" data-pay="transfer" hidden><p class="pay-note"><strong>Pago de prueba.</strong> Al confirmar te mostraremos un IBAN de ejemplo; el pedido queda pendiente de pago. No se cobra nada.</p></div>
 <label class="check"><input type="checkbox" id="c-terms" required><span>He leído los <a href="terminos.html" target="_blank" rel="noopener">términos y condiciones</a> y la <a href="privacidad.html" target="_blank" rel="noopener">política de privacidad</a>.</span></label>
-<label class="check save-data"><input type="checkbox" id="save-data" checked><span>Guardar mis datos y mi método de pago preferido para próximas compras.</span></label>
+<label class="check save-data"><input type="checkbox" id="save-data"><span>Guardar mis datos y mi método de pago preferido para próximas compras.</span></label>
 <button class="btn btn-primary btn-lg btn-block" type="submit" id="pay">Confirmar pedido</button>
 <p class="muted small" style="text-align:center;margin:12px 0 0">Devolución gratis en 30 días · Garantía de 3 años</p></section>
 </form><aside class="summary" id="summary" aria-label="Resumen"></aside></div></div>

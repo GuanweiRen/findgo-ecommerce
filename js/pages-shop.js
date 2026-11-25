@@ -152,6 +152,24 @@
     trip: { escapada: "Escapada", negocios: "Negocios", familia: "Familia", largo: "Viaje largo" } };
   var NAMES = { size: "Tamaño", func: "Función", trip: "Tipo de viaje", color: "Color", sort: "Ordenar" };
 
+  /* SEO de la ficha: título, descripción, Open Graph y datos estructurados propios de cada producto */
+  function seo(p) {
+    var kind = p.followMe ? "maleta inteligente con Follow Me" : p.id === "lite" ? "maleta con localizador GPS" : String(p.short || "").replace(/\.$/, "").replace(/^./, function (c) { return c.toLowerCase(); });
+    var title = p.name + (kind ? ", " + kind : "") + " | FindGo";
+    var d0 = String(p.desc || p.short || ""), desc = d0.length > 155 ? d0.slice(0, 152).replace(/\s+\S*$/, "") + "…" : d0;
+    var url = location.origin + location.pathname + "?id=" + p.id;
+    function meta(sel, attr, val) { var m = document.querySelector(sel); if (!m) { m = document.createElement("meta"); var k = sel.match(/\[(\w+)="([^"]+)"\]/); m.setAttribute(k[1], k[2]); document.head.appendChild(m); } m.setAttribute(attr, val); }
+    document.title = title;
+    meta('meta[name="description"]', "content", desc);
+    meta('meta[property="og:title"]', "content", title);
+    meta('meta[property="og:description"]', "content", desc);
+    meta('meta[property="og:url"]', "content", url);
+    meta('meta[property="og:type"]', "content", "product");
+    var ld = { "@context": "https://schema.org", "@type": "Product", name: p.name, description: p.desc, brand: { "@type": "Brand", name: "FindGo" }, url: url };
+    if (p.price != null) ld.offers = { "@type": "Offer", price: String(p.price.toFixed(2)), priceCurrency: "EUR", availability: "https://schema.org/InStock", url: url };
+    var sc = document.getElementById("ld-product") || document.createElement("script"); sc.id = "ld-product"; sc.type = "application/ld+json"; sc.textContent = JSON.stringify(ld); document.head.appendChild(sc);
+  }
+
   function norm(s) { return String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
 
   var PR = { "0-50": [0, 50, "Hasta 50 €"], "50-200": [50, 200, "De 50 a 200 €"], "200-400": [200, 400, "De 200 a 400 €"], "400+": [400, 1e9, "Más de 400 €"] };
@@ -161,11 +179,8 @@
     if (st.cat && !FG.CATS[st.cat]) st.cat = "";
     var closed = {};
 
-    var base = FG.PRODUCTS.filter(function (p) {
-      if (st.cat && p.cat !== st.cat) return false;
-      if (st.q) { var t = norm(st.q); if (norm(p.name + " " + p.short + " " + p.desc).indexOf(t) < 0) return false; }
-      return true;
-    });
+    var base = FG.PRODUCTS.filter(function (p) { return !st.cat || p.cat === st.cat; });
+    if (st.q) base = FG.search(st.q, base);
     var pr = base.filter(function (p) { return p.price != null; }).map(function (p) { return p.price; });
     var PMIN = pr.length ? Math.floor(Math.min.apply(null, pr) / 10) * 10 : 0, PMAX = pr.length ? Math.ceil(Math.max.apply(null, pr) / 10) * 10 : 0, STEP = (PMAX - PMIN) > 300 ? 10 : 5;
     function lo() { var v = st.pmin === "" ? PMIN : +st.pmin; return isNaN(v) ? PMIN : Math.max(PMIN, Math.min(v, PMAX)); }
@@ -228,7 +243,9 @@
       active().forEach(function (k) { chips += '<button class="chip" data-clear="' + k + '">' + (k === "fm" ? "" : NAMES[k] ? NAMES[k] + ": " : k === "price" ? "Precio: " : "") + esc(labelOf(k)) + ' ✕</button>'; });
       $("#chips").innerHTML = chips ? chips + '<button class="chip chip-clear" data-clear="all">Limpiar todo</button>' : "";
       var cards = list.map(FG.card);
-      $("#grid").innerHTML = list.length ? cards.join("") : '<div class="empty" style="grid-column:1/-1"><h3>No hay productos con esos filtros</h3><p>Prueba a quitar alguno.</p><button class="btn btn-primary" data-clear="all">Limpiar filtros</button></div>';
+      $("#grid").innerHTML = list.length ? cards.join("") : !base.length && st.q
+        ? '<div class="empty" style="grid-column:1/-1"><h3>No encontramos «' + esc(st.q) + '»</h3><p>Prueba con ' + FG.SEARCH_SUGG.map(function (x) { return '<a class="link-u" href="catalogo.html?q=' + encodeURIComponent(x) + '">' + esc(x) + '</a>'; }).join(", ") + '.</p><a class="btn btn-primary" href="catalogo.html">Ver todo el catálogo</a></div>'
+        : '<div class="empty" style="grid-column:1/-1"><h3>No hay productos con esos filtros</h3><p>Prueba a quitar alguno.</p><button class="btn btn-primary" data-clear="all">Limpiar filtros</button></div>';
       var pb = $("#promo");
       pb.innerHTML = list.length && st.cat !== "personalizacion" && !st.q ? '<div class="promo-bar"><div class="pb-art" aria-hidden="true">' + FG.art("tag", "cuero", { initials: "AB" }) + FG.art("engrave", "azul", { initials: "AMG" }) + '</div><div class="pb-text"><strong>Hazla tuya</strong><p>Iniciales grabadas, asas de color y fundas con tu diseño.</p></div><a class="btn btn-sm" href="catalogo.html?cat=personalizacion">Ver personalización</a></div>' : "";
       var fa = $("#f-apply"); if (fa) fa.textContent = "Ver " + list.length + (list.length === 1 ? " resultado" : " resultados");
@@ -279,7 +296,7 @@
     var qs = new URLSearchParams(location.search), id = qs.get("id"), p = FG.product(id), root = $("#pdp");
     if (!p) { root.innerHTML = '<div class="empty container"><h1>Producto no encontrado</h1><a class="btn" href="catalogo.html">Ver catálogo</a></div>'; return; }
     if (p.href) { location.replace(p.href); return; }
-    document.title = FG.lineName(p) + " · FindGo";
+    seo(p);
     var qc = qs.get("color");
     var s = { color: p.colors ? (qc && p.colors.indexOf(qc) > -1 ? qc : p.colors[0]) : null, variant: p.variants ? p.variants[0].n : null, initials: "", font: "clasica", qty: 1 };
     var needIni = !!p.needsInitials;
@@ -298,7 +315,7 @@
       return { svg: FG.art("pack3", s.color || "azul"), cap: "Cabin 55 cm · Medium 65 cm · Large 75 cm." };
     }
     var SUIT = ["cabin", "medium", "large", "lite"], isSuit = SUIT.indexOf(p.id) > -1;
-    var rate = p.rating ? '<div class="p-rate" aria-label="Valoración ' + p.rating + ' de 5"><span class="st" aria-hidden="true">★★★★★</span> <a href="#reviews">' + String(p.rating).replace(".", ",") + " (" + p.reviews + ")</a></div>" : "";
+    var rate = p.rating ? '<div class="p-rate" aria-label="Valoración ' + p.rating + ' de 5"><span class="st" aria-hidden="true">★★★★★</span> <a href="#reviews">' + p.rating.toFixed(1).replace(".", ",") + " (" + p.reviews + ")</a></div>" : "";
     var subtitle = p.followMe ? "Maleta inteligente con Follow Me" : p.id === "lite" ? "Maleta con localizador GPS" : esc(p.short || "");
     var h = '<div class="pdp2"><div class="gal" id="gal" aria-label="Imágenes del producto"></div><div class="pinfo">' +
       '<nav class="crumbs" aria-label="Migas"><a href="index.html">Inicio</a> / <a href="catalogo.html?cat=' + p.cat + '">' + FG.CATS[p.cat].name + '</a></nav>' +
@@ -352,11 +369,14 @@
     if (ini) ini.addEventListener("input", function () { ini.value = ini.value.replace(/[^\p{L}\p{N}]/gu, "").toUpperCase().slice(0, 3); s.initials = ini.value; ini.closest(".field").classList.remove("bad"); render(); });
     $("#mbuy-btn").addEventListener("click", add);
     $("#mbuy").classList.add("on"); document.body.classList.add("has-mobile-buy");
+    // En escritorio la barra de compra aparece cuando el botón principal sale de la pantalla
+    if ("IntersectionObserver" in window) new IntersectionObserver(function (en) { var out = !en[0].isIntersecting; $("#mbuy").classList.toggle("show", out); document.body.classList.toggle("buy-bar-on", out); }, { threshold: 0 }).observe($("#add"));
+    else { $("#mbuy").classList.add("show"); document.body.classList.add("buy-bar-on"); }
     render();
     var gal = $("#gal");
     gal.addEventListener("scroll", function () { var n = Math.round(gal.scrollLeft / gal.clientWidth) + 1, el = $("#gal-count"); if (el && gal.scrollWidth > gal.clientWidth + 2) el.textContent = n + " / " + views.length; }, { passive: true });
 
-    if (p.rating && (p.followMe || p.id === "lite")) { $("#reviews").hidden = false; $("#rev-list").innerHTML = FG.REVIEWS.slice(0, 3).map(function (r) { return '<article class="rev"><div class="st" aria-label="' + r.r + ' de 5">' + "★★★★★".slice(0, r.r) + '<span class="off">' + "★★★★★".slice(r.r) + '</span></div><h3>' + esc(r.t) + '</h3><p>' + esc(r.x) + '</p><small>' + esc(r.n) + ' · opinión de ejemplo</small></article>'; }).join(""); }
+    if (p.reviews) { $("#reviews").hidden = false; $("#rev-list").innerHTML = FG.REVIEWS.filter(function (r) { return r.p === p.id; }).map(function (r) { return '<article class="rev"><div class="st" aria-label="' + r.r + ' de 5">' + "★★★★★".slice(0, r.r) + '<span class="off">' + "★★★★★".slice(r.r) + '</span></div><h3>' + esc(r.t) + '</h3><p>' + esc(r.x) + '</p><small>' + esc(r.n) + ' · opinión de ejemplo</small></article>'; }).join(""); }
     var rel = FG.upsell(4);
     if (!rel.length) rel = FG.PRODUCTS.filter(function (x) { return x.cat === p.cat && x.id !== p.id; }).slice(0, 4);
     if (rel.length) { $("#related").hidden = false; $("#related-grid").innerHTML = rel.map(FG.card).join(""); }

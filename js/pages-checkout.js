@@ -65,7 +65,11 @@
     draw();
   }
 
-  function mark(el, ok) { el.closest(".field").classList.toggle("bad", !ok); return ok; }
+  function mark(el, ok) {
+    el.closest(".field").classList.toggle("bad", !ok);
+    if (ok) el.removeAttribute("aria-invalid"); else el.setAttribute("aria-invalid", "true");
+    return ok;
+  }
 
   /* ================= FINALIZAR COMPRA (una página) ================= */
   function checkout() {
@@ -79,7 +83,7 @@
     var sel = f.elements.country;
     sel.innerHTML = Object.keys(FG.COUNTRIES).map(function (k) { return '<option value="' + k + '"' + (k === country ? " selected" : "") + '>' + esc(FG.COUNTRIES[k].n) + '</option>'; }).join("");
     function euro(n) { return n.toFixed(2).replace(".", ",") + "\u00a0€"; }
-    function cpHint() { var c = FG.country(sel.value); f.elements.cp.placeholder = "Ej.: " + c.ph; $("#f-cp-err").textContent = c.cpErr; }
+    function cpHint() { var c = FG.country(sel.value); f.elements.cp.placeholder = "Ej.: " + c.ph; f.elements.cp.inputMode = /[A-Za-z]/.test(c.ph) ? "text" : "numeric"; $("#f-cp-err").textContent = c.cpErr; }
     function opts() {
       var cc = FG.checkout.get(), c = FG.country(cc.country), cur = cc.shipping, t = FG.totals(FG.lines(), { code: cc.code, country: cc.country }), free = (t.sub - t.discount) >= c.free;
       $("#ship-opts").innerHTML =
@@ -93,16 +97,47 @@
     // Métodos de pago: se muestra solo el panel del elegido
     var payBox = $("#pay-opts"), pay = pr.pay && FG.PAYMENTS.some(function (m) { return m[0] === pr.pay; }) ? pr.pay : "card";
     payBox.innerHTML = FG.PAYMENTS.map(function (m) { return '<label class="opt"><input type="radio" name="pay" value="' + m[0] + '"' + (m[0] === pay ? " checked" : "") + '><span class="grow"><strong>' + esc(m[1]) + '</strong><br><span class="muted small">' + esc(m[2]) + '</span></span></label>'; }).join("");
-    function showPay() { pay = f.elements.pay.value; document.querySelectorAll(".pay-panel").forEach(function (p) { p.hidden = p.dataset.pay !== pay; }); $("#pay").textContent = pay === "transfer" ? "Confirmar pedido" : "Pagar y confirmar"; }
-    if (pr.bizumTel) $("#z-tel").value = pr.bizumTel; else if (f.elements.tel.value) $("#z-tel").value = f.elements.tel.value;
-    if (pr.paypalMail) $("#pp-mail").value = pr.paypalMail; else if (f.elements.email.value) $("#pp-mail").value = f.elements.email.value;
+    function showPay() {
+      pay = f.elements.pay.value; document.querySelectorAll(".pay-panel").forEach(function (p) { p.hidden = p.dataset.pay !== pay; });
+      // Al elegir Bizum o PayPal se copian el teléfono y el correo ya escritos arriba (si no se han editado a mano)
+      var zt = $("#z-tel"), pm = $("#pp-mail");
+      if (pay === "bizum" && !zt.dataset.touched && f.elements.tel.value.trim()) zt.value = f.elements.tel.value.trim();
+      if (pay === "paypal" && !pm.dataset.touched && f.elements.email.value.trim()) pm.value = f.elements.email.value.trim(); $("#pay").textContent = pay === "transfer" ? "Confirmar pedido" : "Pagar y confirmar"; }
+    if (pr.bizumTel) { $("#z-tel").value = pr.bizumTel; $("#z-tel").dataset.touched = "1"; }
+    if (pr.paypalMail) { $("#pp-mail").value = pr.paypalMail; $("#pp-mail").dataset.touched = "1"; }
     payBox.addEventListener("change", showPay); showPay();
 
     var num = $("#c-num"), exp = $("#c-exp"), cvc = $("#c-cvc");
     num.addEventListener("input", function () { var v = num.value.replace(/\D/g, "").slice(0, 16); num.value = v.replace(/(.{4})/g, "$1 ").trim(); });
     exp.addEventListener("input", function () { var v = exp.value.replace(/\D/g, "").slice(0, 4); exp.value = v.length > 2 ? v.slice(0, 2) + "/" + v.slice(2) : v; });
     cvc.addEventListener("input", function () { cvc.value = cvc.value.replace(/\D/g, "").slice(0, 3); });
-    f.addEventListener("input", function (e) { if (e.target.name === "cp") e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9 \-]/g, "").slice(0, 8); if (e.target.closest(".field.bad")) e.target.closest(".field").classList.remove("bad"); });
+    f.addEventListener("input", function (e) { if (e.target.name === "cp") e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9 \-]/g, "").slice(0, 8); if (e.target.closest(".field.bad")) mark(e.target, true); if (e.target.id === "z-tel" || e.target.id === "pp-mail") e.target.dataset.touched = "1"; });
+
+    // Cada mensaje de error queda vinculado a su campo para los lectores de pantalla
+    f.querySelectorAll(".field").forEach(function (fl) { var inp = fl.querySelector("input,select"), er = fl.querySelector(".err"); if (!inp || !er) return; if (!er.id) er.id = inp.id + "-err"; inp.setAttribute("aria-describedby", er.id); });
+
+    var phoneOk = function (x) { return x.replace(/[\s.\-+()]/g, "").replace(/^34/, "").length >= 9 && /^[\d\s.\-+()]+$/.test(x); };
+    var mailOk = function (x) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x.trim()); };
+    function expOk() { var m = /^(\d{2})\/(\d{2})$/.exec(exp.value), now = new Date(); if (!m) return false; var mm = +m[1], yy = 2000 + +m[2]; return mm >= 1 && mm <= 12 && (yy > now.getFullYear() || (yy === now.getFullYear() && mm >= now.getMonth() + 1)); }
+    function numMsg() { var d = num.value.replace(/\s/g, ""); $("#c-num-err").textContent = d.length < 16 ? "Introduce los 16 dígitos de la tarjeta de prueba." : "Solo se admite la tarjeta de prueba 4242 4242 4242 4242."; }
+    // Regla de cada campo: devuelve true si es válido
+    var RULES = {
+      "f-email": function (e) { return mailOk(e.value); },
+      "f-tel": function (e) { return phoneOk(e.value.trim()); },
+      "f-name": function (e) { return e.value.trim().length > 0; },
+      "f-last": function (e) { return e.value.trim().length > 0; },
+      "f-addr": function (e) { return e.value.trim().length > 4; },
+      "f-cp": function (e) { return FG.country(f.elements.country.value).cp.test(e.value.trim()); },
+      "f-city": function (e) { return e.value.trim().length > 0; },
+      "c-name": function (e) { return e.value.trim().length > 1; },
+      "c-num": function (e) { numMsg(); return e.value.replace(/\s/g, "") === "4242424242424242"; },
+      "c-exp": function () { return expOk(); },
+      "c-cvc": function (e) { return /^\d{3}$/.test(e.value); },
+      "z-tel": function (e) { var x = e.value; return x.replace(/[\s.\-+()]/g, "").replace(/^34/, "").length === 9 && /^[\d\s.\-+()]+$/.test(x); },
+      "pp-mail": function (e) { return mailOk(e.value); }
+    };
+    // Validación al salir de cada campo
+    f.addEventListener("focusout", function (e) { var r = RULES[e.target.id]; if (r) mark(e.target, r(e.target)); });
 
     f.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -110,7 +145,7 @@
       var name = $("#c-name"), digits = num.value.replace(/\s/g, "");
       var m = /^(\d{2})\/(\d{2})$/.exec(exp.value), now = new Date(), okE = false;
       if (m) { var mm = +m[1], yy = 2000 + +m[2]; okE = mm >= 1 && mm <= 12 && (yy > now.getFullYear() || (yy === now.getFullYear() && mm >= now.getMonth() + 1)); }
-      $("#c-num-err").textContent = digits.length < 16 ? "Introduce los 16 dígitos de la tarjeta de prueba." : "Solo se admite la tarjeta de prueba 4242 4242 4242 4242.";
+      numMsg();
       var checks = [
         mark(f.elements.email, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("email"))),
         mark(f.elements.tel, v("tel").replace(/[\s.\-+()]/g, "").replace(/^34/, "").length >= 9 && /^[\d\s.\-+()]+$/.test(v("tel"))),
@@ -139,8 +174,11 @@
         };
         FG.orders.add(order);
         if (order.lines.some(function (l) { return l.id === "premium"; })) FG.subs.set(true);
-        if (!FG.session.get()) FG.session.login(co2.data.name + " " + co2.data.last, co2.data.email);
+        var keep = $("#save-data").checked;
+        if (keep && !FG.session.get()) FG.session.login(co2.data.name + " " + co2.data.last, co2.data.email);
         FG.cart.clear(); FG.checkout.set({ code: "" });
+        // Sin permiso para guardar datos, no queda nada del pedido en curso
+        if (!keep) { try { localStorage.removeItem("fg:checkout"); } catch (e) {} }
         location.href = "confirmacion.html?o=" + encodeURIComponent(order.id);
       }, 1100);
     });
@@ -156,10 +194,10 @@
   function confirm() {
     var id = new URLSearchParams(location.search).get("o"), orders = FG.orders.get(), o = orders.filter(function (x) { return x.id === id; })[0] || (id ? null : orders[0]);
     if (!o) { $("#confirm").innerHTML = '<div class="empty"><h2>No encontramos ese pedido</h2><a class="btn" href="cuenta.html">Ir a Mi cuenta</a></div>'; return; }
-    var a = o.address;
-    $("#confirm").innerHTML = '<div class="confirm"><div class="big-ok">' + FG.icon("check") + '</div><h1 style="font-size:2.2rem">Gracias, ' + esc(a.name) + '</h1><p class="muted">Tu pedido está confirmado. Correo de contacto: <strong>' + esc(a.email) + '</strong>.</p><div class="order-no" aria-label="Número de pedido">' + esc(o.id) + '</div>' +
+    var a = o.address, cc = a.country || "ES", dd = o.shipping === "express" ? (cc === "ES" ? [1, 2] : /^(IC|CE|ML)$/.test(cc) ? [3, 5] : [2, 4]) : FG.country(cc).days;
+    $("#confirm").innerHTML = '<div class="confirm"><div class="big-ok">' + FG.icon("check") + '</div><h1 style="font-size:2.2rem">Gracias, ' + esc(a.name) + '</h1><p class="muted">Tu pedido está confirmado. Correo de contacto: <strong>' + esc(a.email) + '</strong>.</p><p class="muted">Siguientes pasos: recibirás un correo de confirmación en esa dirección y, cuando salga tu envío, otro con el enlace de seguimiento.</p><div class="order-no" aria-label="Número de pedido">' + esc(o.id) + '</div>' +
       '<div class="panel"><h2 style="font-size:1.2rem">Resumen del pedido</h2>' + FG.orderSummary(o) + '</div>' +
-      '<div class="panel"><h2 style="font-size:1.2rem">Entrega</h2><p style="margin:0">' + esc(a.name + " " + a.last) + '<br>' + esc(a.addr) + '<br>' + esc(a.cp + " " + a.city) + (a.country ? '<br>' + esc(FG.country(a.country).n) : "") + '<br><span class="muted">' + (o.shipping === "express" ? "Express" : "Estándar") + ' · ' + esc(payText(o)) + '</span></p>' + (o.payment && o.payment.method === "transfer" ? '<p class="muted small" style="margin:12px 0 0">IBAN de ejemplo para la transferencia: <span class="mono">ES00 0000 0000 0000 0000 0000</span> (ficticio). Concepto: ' + esc(o.id) + '.</p>' : "") + '</div>' +
+      '<div class="panel"><h2 style="font-size:1.2rem">Entrega</h2><p style="margin:0">' + esc(a.name + " " + a.last) + '<br>' + esc(a.addr) + '<br>' + esc(a.cp + " " + a.city) + (a.country ? '<br>' + esc(FG.country(a.country).n) : "") + '<br><span class="muted">' + (o.shipping === "express" ? "Express" : "Estándar") + ' · ' + esc(payText(o)) + '</span><br><strong>Entrega estimada: ' + FG.deliveryText(dd, o.date) + '</strong></p>' + (o.payment && o.payment.method === "transfer" ? '<p class="muted small" style="margin:12px 0 0">IBAN de ejemplo para la transferencia: <span class="mono">ES00 0000 0000 0000 0000 0000</span> (ficticio). Concepto: ' + esc(o.id) + '.</p>' : "") + '</div>' +
       '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px"><a class="btn btn-primary" href="cuenta.html">Ver en Mi cuenta</a><a class="btn btn-ghost" href="index.html">Volver al inicio</a></div></div>';
   }
 

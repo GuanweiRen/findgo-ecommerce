@@ -137,10 +137,11 @@ dialog.is-in::backdrop { opacity: 1; }
 #toasts { position: fixed; left: 0; right: 0; bottom: calc(20px + env(safe-area-inset-bottom)); display: grid; justify-items: center; gap: 8px; z-index: 300; pointer-events: none; padding-inline: 16px; }
 .toast { background: var(--night); color: #fff; padding: 13px 20px; border-radius: 12px; font-weight: 500; font-size: .95rem; box-shadow: var(--shadow); opacity: 0; transform: translateY(12px); transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out); max-width: 100%; }
 .toast.in { opacity: 1; transform: none; }
-.cookie { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); max-width: 540px; margin-left: 0; z-index: 120; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 22px; display: grid; gap: 14px; opacity: 0; transform: translateY(16px); transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }
+.cookie { position: fixed; left: 0; right: 0; bottom: 0; z-index: 120; background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -6px 20px rgba(0,0,0,.08); padding: 6px max(var(--gutter), env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom)); display: flex; align-items: center; justify-content: center; gap: 6px 20px; flex-wrap: wrap; opacity: 0; transform: translateY(16px); transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }
 .cookie.is-in { opacity: 1; transform: none; }
-.cookie p { margin: 0; font-size: .92rem; }
-.cookie-actions { display: flex; gap: 8px; flex-wrap: wrap; } .cookie .btn { flex: 1 1 140px; }
+.cookie p { margin: 0; font-size: .88rem; flex: 1 1 320px; max-width: 760px; }
+.cookie-actions { display: flex; gap: 8px; flex-wrap: nowrap; } .cookie .btn { flex: 0 0 auto; white-space: nowrap; min-height: 32px; padding-top: 4px; padding-bottom: 4px; }
+@media (max-width: 560px) { .cookie-actions { width: 100%; } .cookie .btn { flex: 1 1 0; } }
 
 /* ---------- Tarjetas de producto ---------- */
 .grid { display: grid; gap: clamp(16px, 2vw, 28px); grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); }

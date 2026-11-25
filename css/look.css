@@ -263,7 +263,7 @@ details.faq summary::after { color: var(--ink); }
 .p-name { font-size: 1.2rem; margin: 2px 0 0; font-weight: 400; }
 .p-rate { white-space: nowrap; font-size: .85rem; padding-top: 8px; } .p-rate a { color: var(--ink); text-decoration: none; font-weight: 600; }
 .p-price { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; margin: 14px 0 20px; font-size: 1.2rem; } .p-price b { font-weight: 800; font-variant-numeric: tabular-nums; } .p-price s { color: var(--ink-2); font-size: .95rem; }
-.stock { display: inline-flex; align-items: center; gap: 7px; color: var(--ok); font-size: .7rem; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; }
+.stock { display: inline-flex; align-items: center; gap: 7px; color: #087a5a; font-size: .7rem; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; }
 .stock i { width: 8px; height: 8px; border-radius: 50% !important; background: currentColor; }
 .p-offer { display: inline-block; border: 1px solid var(--ink); padding: 10px 14px; margin-bottom: 24px; font-weight: 800; font-size: .7rem; text-transform: uppercase; letter-spacing: .02em; }
 .p-opt { margin-bottom: 20px; }
@@ -525,6 +525,13 @@ body[data-page="catalog"] .club-tab { display: none; }
 .bot > * { pointer-events: auto; }
 body.has-mobile-buy .bot, body.has-mobile-pay .bot { bottom: calc(100px + env(safe-area-inset-bottom)); }
 @media (min-width: 861px) { body.has-mobile-buy .bot, body.has-mobile-pay .bot { bottom: calc(16px + env(safe-area-inset-bottom)); } }
+body.has-cookie .bot { bottom: calc(64px + env(safe-area-inset-bottom)); }
+@media (max-width: 560px) { body.has-cookie .bot { bottom: calc(150px + env(safe-area-inset-bottom)); } }
+/* En móvil el aviso de cookies se apoya sobre la barra fija de compra o de pago */
+@media (max-width: 860px) {
+  body.has-cookie.has-mobile-buy .cookie, body.has-cookie.has-mobile-pay .cookie { bottom: calc(72px + env(safe-area-inset-bottom)); }
+  body.has-cookie.has-mobile-buy .bot, body.has-cookie.has-mobile-pay .bot { bottom: calc(210px + env(safe-area-inset-bottom)); }
+}
 .bot-fab { order: 2; display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 20px 0 16px; border: 0; border-radius: 999px !important; background: #2b52f0; color: #fff; font-weight: 800; font-size: .9rem; cursor: pointer; box-shadow: 0 8px 24px rgb(43 82 240 / .35); transition: transform 160ms var(--ease-out), box-shadow 160ms ease; }
 .bot-fab:active { transform: scale(.96); }
 @media (hover: hover) and (pointer: fine) { .bot-fab:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgb(43 82 240 / .45); } }
@@ -562,3 +569,37 @@ body.has-mobile-buy .bot, body.has-mobile-pay .bot { bottom: calc(100px + env(sa
 .bot-send .icon { width: 18px; height: 18px; }
 @media (prefers-reduced-motion: reduce) { .bot-panel, .bot-msg, .bot-msg.typing span { animation: none; } }
 @media (max-width: 520px) { .bot-fab-t { display: none; } .bot-fab { padding: 0 15px; } }
+
+/* Encabezados h3 con el aspecto que tenían como h4 (orden correcto de encabezados) */
+.trust-it h3, .mega h3 { font-family: var(--font-display); line-height: 1.1; text-wrap: balance; font-size: .8rem; font-weight: 800; font-stretch: 125%; font-variation-settings: "wdth" 125; letter-spacing: .02em; text-transform: uppercase; }
+.trust-it h3 { margin: 0 0 6px; font-size: .78rem; }
+.mega h3 { font-size: .72rem; color: var(--ink); margin: 0 0 12px; }
+
+/* Pago: cabecera reducida (solo logotipo y ayuda) */
+body[data-page="checkout"] .main-nav, body[data-page="checkout"] .h-left, body[data-page="checkout"] .h-right > :not(.co-help) { display: none !important; }
+body[data-page="checkout"] .hbar { grid-template-columns: 1fr auto 1fr; }
+body[data-page="checkout"] .logo { grid-column: 2; justify-self: center; }
+body[data-page="checkout"] .h-right { grid-column: 3; justify-self: end; }
+.co-help { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; padding: 10px 4px; }
+
+/* Ficha en escritorio: barra de compra fija cuando el botón principal sale de la pantalla */
+@media (min-width: 861px) {
+  .mobile-buy.on.show { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; gap: 20px; align-items: center; justify-content: center; background: var(--surface); border-top: 1px solid var(--line); padding: 10px var(--gutter); box-shadow: 0 -8px 24px rgb(16 26 51 / .08); }
+  .mobile-buy .tt { line-height: 1.2; } .mobile-buy .tt small { display: block; color: var(--ink-2); font-size: .78rem; }
+  .mobile-buy .btn { flex: 0 1 320px; }
+  body.buy-bar-on .bot { bottom: calc(84px + env(safe-area-inset-bottom)); }
+  body.buy-bar-on.has-cookie .bot { bottom: calc(140px + env(safe-area-inset-bottom)); }
+  body.buy-bar-on .cookie { bottom: 76px; }
+}
+
+/* Catálogo en escritorio: el panel de filtros va a la izquierda */
+@media (min-width: 960px) {
+  .cat-top { grid-template-columns: var(--fw) minmax(0, 1fr) 232px; }
+  .ct-filter { order: -1; border-left: 0; border-right: 1px solid var(--line); }
+  .ct-crumbs { order: 0; } .ct-sort { order: 1; }
+  .cat-layout { grid-template-columns: var(--fw) minmax(0, 1fr); }
+  .cat-layout .filters { grid-column: 1; grid-row: 1; border-left: 0; border-right: 1px solid var(--line); }
+  .cat-layout .cat-main { grid-column: 2; grid-row: 1; min-width: 0; }
+  .cat-layout.no-filters { grid-template-columns: minmax(0, 1fr); }
+  .cat-layout.no-filters .cat-main { grid-column: 1; }
+}
