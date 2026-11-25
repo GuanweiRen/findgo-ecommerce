@@ -9,14 +9,16 @@
     coral:     { name: "Coral",       hex: "#ff7e6b" },
     negro:     { name: "Negro",       hex: "#121316" },
     cuero:     { name: "Cuero",       hex: "#9a6a3c" },
-    bosque:    { name: "Verde bosque", hex: "#1f4d3a" }
+    bosque:    { name: "Verde bosque", hex: "#1f4d3a" },
+    rojo:      { name: "Rojo",        hex: "#c8102e" }
   };
   var SUIT = ["grafito", "arena", "azul", "salvia", "hielo", "coral", "negro"];
   var BAG = ["grafito", "arena", "azul", "salvia", "hielo", "coral", "negro"];
 
   var CATS = {
     maletas:         { name: "Maletas",         desc: "Maletas inteligentes que te siguen y se localizan solas." },
-    equipaje:        { name: "Bolsas y packs",  desc: "Packs, mochilas, bolsas y más para cada tipo de viaje." },
+    equipaje:        { name: "Packs",           desc: "Dos o tres maletas FindGo en el mismo color, con descuento." },
+    bolsas:          { name: "Bolsas",          desc: "Mochilas, bolsas y maletines para cada tipo de viaje." },
     personalizacion: { name: "Personalización", desc: "Hazla tuya: iniciales, colores y diseños propios." },
     accesorios:      { name: "Accesorios",      desc: "Baterías, cargadores, fundas y pequeños imprescindibles." },
     servicios:       { name: "Servicios",       desc: "Garantía, app Premium, reparación y soluciones para empresas." }
@@ -58,26 +60,26 @@
     { id: "pack-familia", cat: "equipaje", name: "Pack Familia (Cabin + Medium + Large)", price: 1049, kind: "pack3", size: "pack", func: "pack", trip: "familia", was: 1197,
       short: "Las tres maletas. Ahorras 148 €.", colors: SUIT, initials: false, tag: "Ahorras 148 €",
       desc: "Las tres tallas FindGo en el mismo color, para no perder de vista a ninguna." },
-    { id: "mochila-day", cat: "equipaje", name: "Mochila Day", price: 149, kind: "backpack", size: "pequeno", func: "mochila", trip: "escapada",
+    { id: "mochila-day", cat: "bolsas", name: "Mochila Day", price: 149, kind: "backpack", size: "pequeno", func: "mochila", trip: "escapada",
       short: "Mochila diaria con bolsillo localizador.", colors: BAG, initials: false, litres: "22 L",
       desc: "Mochila de uso diario con bolsillo antirrobo para el tag localizador y puerto USB-C externo." },
-    { id: "weekender", cat: "equipaje", name: "Bolsa Weekender", price: 129, kind: "duffel", size: "mediano", func: "bolsa", trip: "escapada",
+    { id: "weekender", cat: "bolsas", name: "Bolsa Weekender", price: 129, kind: "duffel", size: "mediano", func: "bolsa", trip: "escapada",
       short: "Para escapadas de fin de semana.", colors: BAG, initials: false, litres: "40 L",
       desc: "Bolsa blanda que se cuelga sobre el asa de la maleta. Cabe bajo el asiento en la mayoría de vuelos." },
-    { id: "underseat", cat: "equipaje", name: "Bolsa Bajo el Asiento", price: 79, kind: "underseat", size: "pequeno", func: "bolsa", trip: "escapada",
+    { id: "underseat", cat: "bolsas", name: "Bolsa Bajo el Asiento", price: 79, kind: "underseat", size: "pequeno", func: "bolsa", trip: "escapada",
       short: "Cabe bajo el asiento de la mayoría de vuelos.", colors: BAG, initials: false, litres: "18 L",
       desc: "Bolsa blanda de 40 × 20 × 25 cm para llevar lo imprescindible sin gastar espacio en el compartimento. Lleva bolsillo para el tag localizador y se cuelga del asa de la maleta." },
-    { id: "maletin", cat: "equipaje", name: "Maletín Negocios", price: 179, kind: "briefcase", size: "pequeno", func: "trabajo", trip: "negocios",
+    { id: "maletin", cat: "bolsas", name: "Maletín Negocios", price: 179, kind: "briefcase", size: "pequeno", func: "trabajo", trip: "negocios",
       short: "Portátil de hasta 16\" y acabado en cuero.", colors: ["negro", "grafito", "azul", "cuero"], initials: false,
       desc: "Maletín para portátil de hasta 16 pulgadas con compartimento para el cargador y encaje en el asa de la maleta." },
-    { id: "kids", cat: "equipaje", name: "FindGo Kids", price: 179, kind: "kids", size: "pequeno", func: "infantil", trip: "familia",
+    { id: "kids", cat: "bolsas", name: "FindGo Kids", price: 179, kind: "kids", size: "pequeno", func: "infantil", trip: "familia",
       short: "Maleta infantil que se localiza y se monta.", colors: ["coral", "salvia", "azul", "hielo"], initials: false, litres: "18 L",
       desc: "Maleta pequeña para los más viajeros, con módulo localizador. Se puede montar y se lleva de la mano." },
 
     // PERSONALIZACION
     { id: "p-iniciales", cat: "personalizacion", name: "Iniciales grabadas", price: 19, kind: "engrave", size: "-", func: "grabado", trip: "-", nonReturnable: true, initials: true, needsInitials: true,
       short: "Hasta 3 letras grabadas en la maleta.", desc: "Grabado láser de hasta tres iniciales. Al ser un producto personalizado no admite devolución salvo defecto (art. 103 TRLGDCU)." },
-    { id: "p-asas", cat: "personalizacion", name: "Asas y ruedas de color", price: 25, kind: "wheel", size: "-", func: "color", trip: "-", colors: SUIT.concat("cuero"),
+    { id: "p-asas", cat: "personalizacion", name: "Asas y ruedas de color", price: 25, kind: "wheel", size: "-", func: "color", trip: "-", colors: SUIT.concat("cuero", "rojo"),
       short: "Cambia el color de asas y ruedas.", desc: "Kit de asas y ruedas en el color que elijas, para que tu maleta sea fácil de reconocer en la cinta." },
     { id: "p-funda-diseno", cat: "personalizacion", name: "Funda con tu diseño", price: 45, kind: "cover", size: "-", func: "funda", trip: "-", nonReturnable: true,
       short: "Sube tu imagen y la imprimimos.", desc: "Funda protectora impresa con la imagen que tú elijas. Producto personalizado: no admite devolución salvo defecto (art. 103 TRLGDCU)." },
@@ -130,10 +132,14 @@
       { t: "Por modelo", links: [["FindGo Cabin 55 cm", "producto.html?id=cabin"], ["FindGo Medium 65 cm", "producto.html?id=medium"], ["FindGo Large 75 cm", "producto.html?id=large"], ["FindGo Lite (solo GPS)", "producto.html?id=lite"]] },
       { t: "Descubre", links: [["Todas las maletas", "catalogo.html?cat=maletas"], ["Cómo funciona Follow Me", "index.html#follow-me"], ["Las dos baterías", "index.html#baterias"]] }
     ]},
-    { cat: "equipaje", feat: "pack-viaje", cols: [
-      { t: "Por tamaño", links: [["Pequeño", "catalogo.html?cat=equipaje&size=pequeno"], ["Mediano", "catalogo.html?cat=equipaje&size=mediano"]] },
-      { t: "Por función", links: [["Packs", "catalogo.html?cat=equipaje&func=pack"], ["Mochilas", "catalogo.html?cat=equipaje&func=mochila"], ["Bolsas", "catalogo.html?cat=equipaje&func=bolsa"], ["Trabajo", "catalogo.html?cat=equipaje&func=trabajo"]] },
-      { t: "Por tipo de viaje", links: [["Escapada", "catalogo.html?cat=equipaje&trip=escapada"], ["Negocios", "catalogo.html?cat=equipaje&trip=negocios"], ["Familia", "catalogo.html?cat=equipaje&trip=familia"], ["Viaje largo", "catalogo.html?cat=equipaje&trip=largo"]] }
+    { cat: "equipaje", feat: "pack-familia", cols: [
+      { t: "Packs", links: [["Pack Viaje (Cabin + Medium)", "producto.html?id=pack-viaje"], ["Pack Familia (Cabin + Medium + Large)", "producto.html?id=pack-familia"]] },
+      { t: "Ver todo", links: [["Todos los packs", "catalogo.html?cat=equipaje"]] }
+    ]},
+    { cat: "bolsas", feat: "mochila-day", cols: [
+      { t: "Por tamaño", links: [["Pequeño", "catalogo.html?cat=bolsas&size=pequeno"], ["Mediano", "catalogo.html?cat=bolsas&size=mediano"]] },
+      { t: "Por función", links: [["Mochilas", "catalogo.html?cat=bolsas&func=mochila"], ["Bolsas", "catalogo.html?cat=bolsas&func=bolsa"], ["Trabajo", "catalogo.html?cat=bolsas&func=trabajo"], ["Infantil", "catalogo.html?cat=bolsas&func=infantil"]] },
+      { t: "Por tipo de viaje", links: [["Escapada", "catalogo.html?cat=bolsas&trip=escapada"], ["Negocios", "catalogo.html?cat=bolsas&trip=negocios"], ["Familia", "catalogo.html?cat=bolsas&trip=familia"]] }
     ]},
     { cat: "personalizacion", feat: "p-iniciales", cols: [
       { t: "Personaliza", links: [["Iniciales grabadas", "producto.html?id=p-iniciales"], ["Asas y ruedas de color", "producto.html?id=p-asas"], ["Funda con tu diseño", "producto.html?id=p-funda-diseno"], ["Etiqueta de cuero", "producto.html?id=p-etiqueta"]] },

@@ -36,6 +36,18 @@
     return "€\u00a0" + new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" }).format(n);
   };
 
+  /* ---------- Texto grabado: tamaño y posición ---------- */
+  FG.TEXT_SIZES = { s: { n: "Pequeño", k: .75 }, m: { n: "Mediano", k: 1 }, l: { n: "Grande", k: 1.3 } };
+  FG.TEXT_POS = { top: { n: "Arriba", y: .3 }, mid: { n: "Centro", y: .54 }, bot: { n: "Abajo", y: .78 } };
+  /* Detalles de las iniciales distintos de los de por defecto: tipo de letra, tamaño y posición */
+  FG.iniDetails = function (l) {
+    var d = [];
+    if (l.font && l.font !== "clasica" && FG.FONTS[l.font]) d.push(FG.FONTS[l.font].n);
+    if (l.tsize && l.tsize !== "m" && FG.TEXT_SIZES[l.tsize]) d.push("tamaño " + FG.TEXT_SIZES[l.tsize].n.toLowerCase());
+    if (l.tpos && l.tpos !== "mid" && FG.TEXT_POS[l.tpos]) d.push(FG.TEXT_POS[l.tpos].n.toLowerCase());
+    return d;
+  };
+
   /* ---------- Carrito ---------- */
   // línea: { key, id, qty, color, initials, font, variant }
   FG.cart = {
@@ -46,7 +58,9 @@
       var p = FG.product(opt.id); if (!p || p.price == null) return null;
       var line = { id: p.id, qty: Math.max(1, opt.qty || 1), color: opt.color || null, initials: (opt.initials || "").trim().slice(0, 3).toUpperCase(), variant: opt.variant || null };
       line.font = line.initials ? (FG.FONTS[opt.font] ? opt.font : "clasica") : null;
-      line.key = [line.id, line.color, line.initials, line.font, line.variant].join("|");
+      line.tsize = line.initials ? (FG.TEXT_SIZES[opt.tsize] ? opt.tsize : "m") : null;
+      line.tpos = line.initials ? (FG.TEXT_POS[opt.tpos] ? opt.tpos : "mid") : null;
+      line.key = [line.id, line.color, line.initials, line.font, line.variant, line.tsize, line.tpos].join("|");
       var cart = this.get(), ex = cart.filter(function (l) { return l.key === line.key; })[0];
       if (ex) ex.qty = Math.min(p.single ? 1 : 99, ex.qty + line.qty); else cart.push(line);
       if (p.single) line.qty = 1;
@@ -192,7 +206,7 @@
 
   FG.orderSummary = function (o) {
     var t = o.totals;
-    return o.lines.map(function (l) { return '<div class="sum-item"><span>' + l.qty + ' × ' + FG.esc(l.name) + (l.initials ? ' (' + FG.esc(l.initials) + (l.font && l.font !== "clasica" && FG.FONTS[l.font] ? ' · ' + FG.esc(FG.FONTS[l.font].n) : "") + ')' : "") + (l.color ? ' · ' + FG.esc(FG.colorName(l.color)) : "") + '</span><span class="mono">' + FG.eur(l.unit * l.qty) + '</span></div>'; }).join("") +
+    return o.lines.map(function (l) { return '<div class="sum-item"><span>' + l.qty + ' × ' + FG.esc(l.name) + (l.initials ? ' (' + FG.esc([l.initials].concat(FG.iniDetails(l)).join(" · ")) + ')' : "") + (l.color ? ' · ' + FG.esc(FG.colorName(l.color)) : "") + '</span><span class="mono">' + FG.eur(l.unit * l.qty) + '</span></div>'; }).join("") +
       '<hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><div class="sum-row"><span>Subtotal</span><span>' + FG.eur(t.sub) + '</span></div>' +
       (t.discount ? '<div class="sum-row disc"><span>CLUB10 (−10 %)</span><span>−' + FG.eur(t.discount) + '</span></div>' : "") +
       '<div class="sum-row"><span>Envío ' + (o.shipping === "express" ? "express" : "estándar") + '</span><span>' + (t.ship ? FG.eur(t.ship) : "Gratis") + '</span></div>' + FG.adjHTML(t) + '<div class="sum-row total"><span>Total</span><span>' + FG.eur(t.total) + '</span></div>' + FG.taxHTML(t, o.address && o.address.country);
