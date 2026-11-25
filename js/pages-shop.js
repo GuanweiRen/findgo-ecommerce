@@ -326,7 +326,7 @@
       return { svg: FG.art("pack3", s.color || "azul"), cap: "Cabin 55 cm · Medium 65 cm · Large 75 cm." };
     }
     var SUIT = ["cabin", "medium", "large", "lite"], isSuit = SUIT.indexOf(p.id) > -1;
-    var rate = p.rating ? '<div class="p-rate" aria-label="Valoración ' + p.rating + ' de 5"><span class="st" aria-hidden="true">★★★★★</span> <a href="#reviews">' + p.rating.toFixed(1).replace(".", ",") + " (" + p.reviews + ")</a></div>" : "";
+    var rate = p.rating ? '<div class="p-rate" aria-label="Valoración ' + p.rating + ' de 5"><span class="st" aria-hidden="true">' + "★★★★★".slice(0, Math.round(p.rating)) + '<span class="off">' + "★★★★★".slice(Math.round(p.rating)) + '</span></span> <a href="#reviews">' + p.rating.toFixed(1).replace(".", ",") + " · " + p.reviews + (p.reviews === 1 ? " opinión" : " opiniones") + "</a></div>" : "";
     var subtitle = p.followMe ? "Maleta inteligente con Follow Me" : p.id === "lite" ? "Maleta con localizador GPS" : esc(p.short || "");
     var h = '<div class="pdp2"><div class="gal" id="gal" aria-label="Imágenes del producto"></div><div class="pinfo">' +
       '<nav class="crumbs" aria-label="Migas"><a href="index.html">Inicio</a> / <a href="catalogo.html?cat=' + p.cat + '">' + FG.CATS[p.cat].name + '</a></nav>' +
