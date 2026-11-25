@@ -172,6 +172,12 @@
     "cabin-limited": { dims: "55 × 40 × 23 cm", who: "Quien quiere una Cabin diferente", days: "corto", cabinOk: true }
   };
   P.forEach(function (p) { var e = EXTRA[p.id]; if (e) for (var k in e) p[k] = e[k]; });
+  // Negro, rojo y azul van siempre los primeros; el resto conserva su orden
+  var FIRST = ["negro", "rojo", "azul"];
+  P.forEach(function (p) {
+    if (!p.colors) return;
+    p.colors = p.colors.slice().sort(function (a, b) { var x = FIRST.indexOf(a), y = FIRST.indexOf(b); return (x < 0 ? 9 : x) - (y < 0 ? 9 : y); });
+  });
 
   var REVIEWS = [
     { n: "Marta R.", r: 5, t: "Por fin no pierdo la maleta de vista", x: "Con la app vi que la mía seguía en la cinta mientras esperaba. Me quitó mucha tensión.", p: "cabin" },
