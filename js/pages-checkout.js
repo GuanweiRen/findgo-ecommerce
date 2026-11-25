@@ -33,7 +33,7 @@
       var co = FG.checkout.get(), t0 = FG.totals(lines, { code: co.code, shipping: "standard" });
       box.innerHTML = FG.progress(t0) + lines.map(function (x) {
         var l = x.line;
-        return '<div class="cart-line" data-key="' + esc(l.key) + '"><div class="thumb">' + FG.productArt(x.p, l.color, l.initials, l.font, { size: l.tsize, pos: l.tpos }) + '</div><div><h3><a href="producto.html?id=' + esc(x.p.id) + '" style="color:inherit;text-decoration:none">' + esc(x.p.name) + '</a></h3><div class="muted small">' + esc(lineMeta(l)) + (x.p.monthly ? "Suscripción mensual" : "") + '</div><div class="muted small">' + FG.eur(x.unit) + (x.p.monthly ? "/mes" : " / ud.") + '</div>' +
+        return '<div class="cart-line" data-key="' + esc(l.key) + '"><div class="thumb">' + FG.productArt(x.p, l.color, l.initials, l.font, { k: l.tk, x: l.tx, y: l.ty }) + '</div><div><h3><a href="producto.html?id=' + esc(x.p.id) + '" style="color:inherit;text-decoration:none">' + esc(x.p.name) + '</a></h3><div class="muted small">' + esc(lineMeta(l)) + (x.p.monthly ? "Suscripción mensual" : "") + '</div><div class="muted small">' + FG.eur(x.unit) + (x.p.monthly ? "/mes" : " / ud.") + '</div>' +
           '<div class="cl-tools">' + (x.p.single ? "" : '<div class="qty" role="group" aria-label="Cantidad"><button data-dec aria-label="Menos">' + FG.icon("minus") + '</button><output>' + l.qty + '</output><button data-inc aria-label="Más">' + FG.icon("plus") + '</button></div>') + '<button class="linkish" data-del>Eliminar</button></div>' +
           (x.p.nonReturnable || l.initials ? '<div class="muted small" style="margin-top:4px">Personalizado: sin devolución salvo defecto.</div>' : "") + '</div><div class="cl-price">' + FG.eur(x.total) + '</div></div>';
       }).join("");
@@ -170,7 +170,7 @@
         var lines = FG.lines(), co2 = FG.checkout.get(), t = FG.totals(lines, { code: co2.code, shipping: co2.shipping, country: co2.country });
         var order = {
           id: FG.orders.nextId(), date: new Date().toISOString(), status: pay === "transfer" ? "Pendiente de pago" : "Confirmado", shipping: co2.shipping, code: t.club ? "CLUB10" : "", totals: t, address: co2.data, payment: payData, last4: payData.last4 || "", returns: [],
-          lines: lines.map(function (x) { return { id: x.p.id, name: x.p.name, qty: x.line.qty, unit: x.unit, color: x.line.color, variant: x.line.variant, initials: x.line.initials, font: x.line.font, tsize: x.line.tsize, tpos: x.line.tpos, nonReturnable: !!(x.p.nonReturnable || x.line.initials), monthly: !!x.p.monthly }; })
+          lines: lines.map(function (x) { return { id: x.p.id, name: x.p.name, qty: x.line.qty, unit: x.unit, color: x.line.color, variant: x.line.variant, initials: x.line.initials, font: x.line.font, tk: x.line.tk, tx: x.line.tx, ty: x.line.ty, nonReturnable: !!(x.p.nonReturnable || x.line.initials), monthly: !!x.p.monthly }; })
         };
         FG.orders.add(order);
         if (order.lines.some(function (l) { return l.id === "premium"; })) FG.subs.set(true);

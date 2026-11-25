@@ -309,7 +309,7 @@
     if (p.href) { location.replace(p.href); return; }
     seo(p);
     var qc = qs.get("color");
-    var s = { color: p.colors ? (qc && p.colors.indexOf(qc) > -1 ? qc : p.colors[0]) : null, variant: p.variants ? p.variants[0].n : null, initials: "", font: "clasica", tsize: "m", tpos: "mid", qty: 1 };
+    var s = { color: p.colors ? (qc && p.colors.indexOf(qc) > -1 ? qc : p.colors[0]) : null, variant: p.variants ? p.variants[0].n : null, initials: "", font: "clasica", fx: FG.textFx(), qty: 1 };
     var needIni = !!p.needsInitials;
     function unit() {
       var base = p.price;
@@ -320,7 +320,7 @@
     var hasViews = !!p.followMe || p.id === "lite";
     var views = !hasViews ? [["Frontal", "front"]] : p.id === "lite" ? [["Frontal", "front"], ["App", "app"], ["Tamaños", "size"]] : [["Frontal", "front"], ["Batería", "bat"], ["App", "app"], ["Tamaños", "size"]];
     function viewArt(v) {
-      if (v === "front") return { svg: FG.productArt(p, s.color, s.initials, s.font, { size: s.tsize, pos: s.tpos }), cap: "" };
+      if (v === "front") return { svg: FG.productArt(p, s.color, s.initials, s.font, s.fx), cap: "" };
       if (v === "bat") return { svg: FG.art("battery", "azul"), cap: "Batería de 98 Wh: se extrae con un clic y viaja contigo en cabina." };
       if (v === "app") return { svg: FG.art("app", "azul"), cap: "Sigue tu maleta en el mapa desde la app, también facturada." };
       return { svg: FG.art("pack3", s.color || "azul"), cap: "Cabin 55 cm · Medium 65 cm · Large 75 cm." };
@@ -338,8 +338,7 @@
     if (p.colors) h += '<div class="p-opt"><div class="p-lab"><b>Color</b> <span id="color-name"></span></div><div class="swatches" role="radiogroup" aria-label="Color">' + p.colors.map(function (c) { return '<button class="swatch" role="radio" aria-checked="false" data-color="' + c + '" aria-label="' + FG.colorName(c) + '"><i style="background:' + FG.COLORS[c].hex + '"></i></button>'; }).join("") + '</div></div>';
     if (p.initials) h += '<div class="field p-ini"><label for="ini">Iniciales grabadas' + (needIni ? "" : " (opcional)") + '</label><input id="ini" maxlength="3" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="Ej.: AMG"><span class="hint">Hasta 3 letras o números. Producto personalizado: no admite devolución salvo defecto.</span><span class="err" id="ini-err">Escribe al menos una inicial.</span></div>';
     if (p.initials) h += '<div class="p-opt p-font"><div class="p-lab"><b>Tipo de letra</b> <span id="font-name"></span></div><div class="boxes" role="radiogroup" aria-label="Tipo de letra">' + Object.keys(FG.FONTS).map(function (k) { var f = FG.FONTS[k]; return '<button type="button" class="box" role="radio" aria-checked="false" data-font="' + k + '" aria-label="' + esc(f.n) + '"><span class="font-sample" style="font-family:' + f.f + ';font-weight:' + f.w + '">ABC</span><small>' + esc(f.n) + '</small></button>'; }).join("") + '</div></div>';
-    if (p.initials) h += '<div class="p-opt p-tsize"><div class="p-lab"><b>Tamaño del texto</b> <span id="tsize-name"></span></div><div class="boxes" role="radiogroup" aria-label="Tamaño del texto">' + Object.keys(FG.TEXT_SIZES).map(function (k) { return '<button type="button" class="box" role="radio" aria-checked="false" data-tsize="' + k + '"><span class="font-sample" style="font-size:' + (FG.TEXT_SIZES[k].k * 1.05) + 'em">A1</span><small>' + FG.TEXT_SIZES[k].n + '</small></button>'; }).join("") + '</div></div>' +
-      '<div class="p-opt p-tpos"><div class="p-lab"><b>Posición del texto</b> <span id="tpos-name"></span></div><div class="boxes" role="radiogroup" aria-label="Posición del texto">' + Object.keys(FG.TEXT_POS).map(function (k) { return '<button type="button" class="box" role="radio" aria-checked="false" data-tpos="' + k + '">' + FG.TEXT_POS[k].n + '</button>'; }).join("") + '</div></div>';
+    if (p.initials) h += '<p class="hint p-drag-hint" id="drag-hint" hidden>Arrastra las iniciales sobre la imagen para colocarlas y usa el círculo de la esquina (o la rueda del ratón) para cambiar su tamaño. <button type="button" class="link-u" id="fx-reset">Volver a centrarlas</button></p>';
     if (p.nonReturnable && !p.initials) h += '<div class="note warn">Producto personalizado: no admite devolución salvo defecto (art. 103 TRLGDCU).</div>';
     if (p.monthly) h += '<div class="note">Suscripción: 2,99 € al mes, cancelable desde Mi cuenta. No se aplica el código CLUB10.</div>';
     h += '<div class="p-buy">' + '<button class="btn btn-primary btn-block btn-lg" id="add">Añadir al carrito</button><button class="fav-line" data-fav="' + p.id + '" aria-pressed="false">' + FG.icon("heart") + '<span>Añadir a favoritos</span></button></div>' +
@@ -363,24 +362,53 @@
       $("#mbuy-price").textContent = FG.eur(u * s.qty);
       if (p.colors) { $("#color-name").textContent = FG.colorName(s.color); root.querySelectorAll(".swatch").forEach(function (b) { b.setAttribute("aria-checked", b.dataset.color === s.color); }); }
       if (p.initials) { $("#font-name").textContent = FG.FONTS[s.font].n; root.querySelectorAll("[data-font]").forEach(function (b) { var on = b.dataset.font === s.font; b.setAttribute("aria-checked", on); b.classList.toggle("on", on); }); }
-      if (p.initials) {
-        $("#tsize-name").textContent = FG.TEXT_SIZES[s.tsize].n; $("#tpos-name").textContent = FG.TEXT_POS[s.tpos].n;
-        root.querySelectorAll("[data-tsize]").forEach(function (b) { var on = b.dataset.tsize === s.tsize; b.setAttribute("aria-checked", on); b.classList.toggle("on", on); });
-        root.querySelectorAll("[data-tpos]").forEach(function (b) { var on = b.dataset.tpos === s.tpos; b.setAttribute("aria-checked", on); b.classList.toggle("on", on); });
-      }
+      if (p.initials) { $("#drag-hint").hidden = !s.initials; wireDrag(); }
       if (p.variants) root.querySelectorAll("[data-variant]").forEach(function (b) { b.setAttribute("aria-checked", b.dataset.variant === s.variant); b.classList.toggle("on", b.dataset.variant === s.variant); });
       if (isSuit) root.querySelectorAll(".boxes a.box").forEach(function (a) { a.href = a.href.replace(/&color=[^&]*/, "") + (s.color ? "&color=" + s.color : ""); });
     }
+    /* Iniciales editables sobre la imagen: arrastrar para mover, tirador o rueda para el tamaño */
+    function wireDrag() {
+      var svg = $("#gp0 svg"), t = svg && svg.querySelector(".ini-txt"); if (!t) return;
+      var NS = "http://www.w3.org/2000/svg", z = t.getAttribute("data-zone").split(",").map(Number);
+      var box = document.createElementNS(NS, "rect"), hd = document.createElementNS(NS, "circle");
+      box.setAttribute("class", "ini-box"); hd.setAttribute("class", "ini-h"); hd.setAttribute("r", "6");
+      svg.appendChild(box); svg.appendChild(hd);
+      var base = parseFloat(t.getAttribute("font-size")) / s.fx.k;
+      function place() {
+        t.setAttribute("x", z[0] + z[2] * s.fx.x); t.setAttribute("y", z[1] + z[3] * s.fx.y); t.setAttribute("font-size", base * s.fx.k);
+        var b = t.getBBox();
+        // Si se sale de la zona grabable, se reduce y se recoloca dentro
+        if (b.width > z[2] - 6 || b.height > z[3] - 6) { s.fx.k *= Math.min((z[2] - 6) / b.width, (z[3] - 6) / b.height); t.setAttribute("font-size", base * s.fx.k); b = t.getBBox(); }
+        var dx = b.x < z[0] + 3 ? z[0] + 3 - b.x : b.x + b.width > z[0] + z[2] - 3 ? z[0] + z[2] - 3 - b.x - b.width : 0;
+        var dy = b.y < z[1] + 3 ? z[1] + 3 - b.y : b.y + b.height > z[1] + z[3] - 3 ? z[1] + z[3] - 3 - b.y - b.height : 0;
+        if (dx || dy) { s.fx.x += dx / z[2]; s.fx.y += dy / z[3]; t.setAttribute("x", z[0] + z[2] * s.fx.x); t.setAttribute("y", z[1] + z[3] * s.fx.y); b = t.getBBox(); }
+        box.setAttribute("x", b.x - 3); box.setAttribute("y", b.y - 3); box.setAttribute("width", b.width + 6); box.setAttribute("height", b.height + 6);
+        hd.setAttribute("cx", b.x + b.width + 3); hd.setAttribute("cy", b.y + b.height + 3);
+      }
+      function pt(e) { var p0 = svg.createSVGPoint(); p0.x = e.clientX; p0.y = e.clientY; return p0.matrixTransform(svg.getScreenCTM().inverse()); }
+      var mode = null, st0, f0;
+      function down(m) { return function (e) { mode = m; st0 = pt(e); f0 = { k: s.fx.k, x: s.fx.x, y: s.fx.y }; try { e.target.setPointerCapture(e.pointerId); } catch (er) {} e.preventDefault(); e.stopPropagation(); }; }
+      function move(e) {
+        if (!mode) return; var q = pt(e);
+        if (mode === "move") { s.fx.x = f0.x + (q.x - st0.x) / z[2]; s.fx.y = f0.y + (q.y - st0.y) / z[3]; }
+        else { var cx = z[0] + z[2] * f0.x, cy = z[1] + z[3] * f0.y, d0 = Math.max(4, Math.hypot(st0.x - cx, st0.y - cy)), d1 = Math.hypot(q.x - cx, q.y - cy); s.fx.k = Math.min(1.8, Math.max(.6, f0.k * d1 / d0)); }
+        place();
+      }
+      function up() { if (!mode) return; mode = null; s.fx = FG.textFx(s.fx); place(); }
+      t.addEventListener("pointerdown", down("move")); hd.addEventListener("pointerdown", down("size"));
+      [t, hd].forEach(function (el) { el.addEventListener("pointermove", move); el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up); });
+      svg.addEventListener("wheel", function (e) { if (!e.target.closest || !e.target.closest(".ini-txt,.ini-h,.ini-box")) return; e.preventDefault(); s.fx.k = Math.min(1.8, Math.max(.6, s.fx.k * (e.deltaY < 0 ? 1.08 : .93))); place(); s.fx = FG.textFx(s.fx); }, { passive: false });
+      place(); s.fx = FG.textFx(s.fx);
+    }
     function add() {
       if (needIni && !s.initials) { $("#ini").closest(".field").classList.add("bad"); $("#ini").focus(); return; }
-      var l = FG.cart.add({ id: p.id, qty: s.qty, color: s.color, variant: s.variant, initials: s.initials, font: s.font, tsize: s.tsize, tpos: s.tpos });
+      var l = FG.cart.add({ id: p.id, qty: s.qty, color: s.color, variant: s.variant, initials: s.initials, font: s.font, fx: s.fx });
       if (l) FG.showAdded(l);
     }
     root.addEventListener("click", function (e) {
       var c = e.target.closest("[data-color]"); if (c) { s.color = c.dataset.color; render(); return; }
       var fo = e.target.closest("[data-font]"); if (fo) { s.font = fo.dataset.font; render(); return; }
-      var ts = e.target.closest("[data-tsize]"); if (ts) { s.tsize = ts.dataset.tsize; render(); return; }
-      var tp = e.target.closest("[data-tpos]"); if (tp) { s.tpos = tp.dataset.tpos; render(); return; }
+      if (e.target.closest("#fx-reset")) { s.fx = FG.textFx(); render(); return; }
       var v = e.target.closest("[data-variant]"); if (v) { s.variant = v.dataset.variant; render(); return; }
       if (e.target.closest("#add")) add();
       if (e.target.closest(".fav-line")) setTimeout(paintFav, 0);

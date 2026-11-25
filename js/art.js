@@ -8,7 +8,7 @@
   var BOT = 182;
 
   /* Maleta de ranuras finas. x, w, h en unidades del viewBox; apoyada en BOT. */
-  var curFont = "clasica", curK = 1, curY = .54;
+  var curFont = "clasica", curK = 1, curX = .5, curY = .54;
   function suit(x, w, h, hex, ini, led, model) {
     model = model || "cabin";
     var y = BOT - h, cx = x + w / 2, lt = light(hex), ink = lt ? "20,22,28" : "255,255,255", g = "", d = "";
@@ -46,7 +46,7 @@
       // Franja dorada y estrella
       d += '<rect x="' + x + '" y="' + (y + h * 0.3) + '" width="' + w + '" height="6" fill="#d9b26a"/><path d="M' + cx + ' ' + (y + h * 0.62) + 'l3.4 7 7.6 1.1-5.5 5.4 1.3 7.6-6.8-3.6-6.8 3.6 1.3-7.6-5.5-5.4 7.6-1.1z" fill="#d9b26a"/>';
     }
-    var txt = ini ? '<text x="' + cx + '" y="' + (y + h * curY) + '" text-anchor="middle" font-family="' + FG.FONTS[curFont].f.replace(/"/g, "'") + '" font-weight="' + FG.FONTS[curFont].w + '" font-size="' + Math.min(w * 0.25, 24) * FG.FONTS[curFont].k * curK + '" fill="rgba(' + ink + ',.92)" letter-spacing="' + FG.FONTS[curFont].ls + '" style="paint-order:stroke">' + FG.esc(ini) + '</text>' : "";
+    var txt = ini ? '<text class="ini-txt" data-zone="' + [x, y, w, h].join(",") + '" x="' + (x + w * curX) + '" y="' + (y + h * curY) + '" text-anchor="middle" font-family="' + FG.FONTS[curFont].f.replace(/"/g, "'") + '" font-weight="' + FG.FONTS[curFont].w + '" font-size="' + Math.min(w * 0.25, 24) * FG.FONTS[curFont].k * curK + '" fill="rgba(' + ink + ',.92)" letter-spacing="' + FG.FONTS[curFont].ls + '" style="paint-order:stroke">' + FG.esc(ini) + '</text>' : "";
     var wheels = model === "large" ?
       '<circle cx="' + (x + 9) + '" cy="' + (BOT + 3) + '" r="4.5" ' + F(1) + '/><circle cx="' + (x + 23) + '" cy="' + (BOT + 3) + '" r="4.5" ' + F(1) + '/><circle cx="' + (x + w - 23) + '" cy="' + (BOT + 3) + '" r="4.5" ' + F(1) + '/><circle cx="' + (x + w - 9) + '" cy="' + (BOT + 3) + '" r="4.5" ' + F(1) + '/>' :
       '<circle cx="' + (x + 12) + '" cy="' + (BOT + 3) + '" r="5" ' + F(1) + '/><circle cx="' + (x + w - 12) + '" cy="' + (BOT + 3) + '" r="5" ' + F(1) + '/>';
@@ -66,8 +66,7 @@
     o = o || {};
     var hex = (FG.COLORS[colorKey] || FG.COLORS.azul).hex, s = o.scale || 1, ini = o.initials || "", body = "", rx = 56;
     curFont = FG.FONTS[o.font] ? o.font : "clasica";
-    curK = FG.TEXT_SIZES && FG.TEXT_SIZES[o.tsize] ? FG.TEXT_SIZES[o.tsize].k : 1;
-    curY = FG.TEXT_POS && FG.TEXT_POS[o.tpos] ? FG.TEXT_POS[o.tpos].y : .54;
+    var fx = FG.textFx ? FG.textFx(o.fx) : { k: 1, x: .5, y: .54 }; curK = fx.k; curX = fx.x; curY = fx.y;
     switch (kind) {
       case "suitcase": case "suit-cabin": case "suit-medium": case "suit-large": case "suit-lite": case "suit-limited":
         var model = kind === "suitcase" ? "cabin" : kind.slice(5), w = 66 + 34 * s, h = 70 + 86 * s; rx = w * 0.6; body = suit(100 - w / 2, w, h, hex, ini, model !== "lite", model); break;
@@ -86,7 +85,7 @@
       case "engrave": body = suit(54, 92, 140, hex, ini || "AB", false); break;
       case "wheel": body = '<circle cx="100" cy="110" r="54" ' + F(1) + '/><circle cx="100" cy="110" r="36" fill="' + hex + '"/><circle cx="100" cy="110" r="36" fill="url(#sh)"/><circle cx="100" cy="110" r="10" ' + F(1) + '/><path d="M100 74v72M64 110h72M74 84l52 52M126 84l-52 52" stroke="rgba(0,0,0,.18)" stroke-width="1.5"/><rect x="68" y="34" width="64" height="10" rx="3" fill="' + hex + '"/>'; break;
       case "cover": body = '<rect x="38" y="40" width="124" height="146" rx="14" fill="none" stroke="' + hex + '" stroke-width="2" stroke-dasharray="5 5"/><rect x="38" y="40" width="124" height="146" rx="14" fill="' + hex + '" opacity=".16"/>' + suit(66, 68, 110, "#b9bdc6", "", false).replace(/<circle[^>]*\/>/g, ""); break;
-      case "tag": body = '<path d="M100 20v38" ' + S(1, 3) + '/><rect x="62" y="56" width="76" height="116" rx="6" fill="' + hex + '"/><rect x="62" y="56" width="76" height="116" rx="6" fill="url(#sh)"/><circle cx="100" cy="74" r="6" fill="var(--bg)"/><rect x="68" y="88" width="64" height="78" rx="3" fill="none" stroke="rgba(255,255,255,.4)" stroke-dasharray="3 3"/><text x="100" y="' + (88 + 78 * (curY + .1)) + '" text-anchor="middle" font-family="' + FG.FONTS[curFont].f + '" font-weight="' + FG.FONTS[curFont].w + '" font-size="' + 22 * FG.FONTS[curFont].k * curK + '" fill="rgba(255,255,255,.92)" letter-spacing="' + FG.FONTS[curFont].ls + '">' + FG.esc(ini || "FG") + '</text>'; break;
+      case "tag": body = '<path d="M100 20v38" ' + S(1, 3) + '/><rect x="62" y="56" width="76" height="116" rx="6" fill="' + hex + '"/><rect x="62" y="56" width="76" height="116" rx="6" fill="url(#sh)"/><circle cx="100" cy="74" r="6" fill="var(--bg)"/><rect x="68" y="88" width="64" height="78" rx="3" fill="none" stroke="rgba(255,255,255,.4)" stroke-dasharray="3 3"/><text class="ini-txt" data-zone="68,95.8,64,78" x="' + (68 + 64 * curX) + '" y="' + (95.8 + 78 * curY) + '" text-anchor="middle" font-family="' + FG.FONTS[curFont].f + '" font-weight="' + FG.FONTS[curFont].w + '" font-size="' + 22 * FG.FONTS[curFont].k * curK + '" fill="rgba(255,255,255,.92)" letter-spacing="' + FG.FONTS[curFont].ls + '">' + FG.esc(ini || "FG") + '</text>'; break;
       case "battery": body = '<rect x="42" y="68" width="116" height="74" rx="8" ' + F(1) + '/><rect x="158" y="92" width="8" height="26" rx="2" ' + F(2) + '/><path d="M58 84v42M72 84v42M86 84v42" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/><path d="M122 80l-16 26h14l-6 22 20-30h-14z" fill="#2f5bff"/>'; break;
       case "charger": body = '<rect x="64" y="52" width="72" height="76" rx="8" style="fill:var(--art-3);stroke:var(--art-2)" stroke-width="1.5"/><rect x="90" y="128" width="20" height="24" rx="3" ' + F(2) + '/><path d="M100 152v28" ' + S(2, 4) + '/><rect x="88" y="70" width="24" height="10" rx="2" ' + F(1) + '/>'; break;
       case "lock": body = '<path d="M72 98V78a28 28 0 0 1 56 0v20" ' + S(2, 9) + '/><rect x="54" y="96" width="92" height="76" rx="8" ' + F(1) + '/><circle cx="100" cy="128" r="8" style="fill:var(--bg)"/><rect x="98" y="132" width="4" height="14" style="fill:var(--bg)"/>'; break;
@@ -103,6 +102,6 @@
   };
   FG.productArt = function (p, color, ini, font, fx) {
     var c = color || (p.colors && p.colors[0]) || (p.kind === "tag" ? "cuero" : "azul");
-    return FG.art(p.kind, c, { scale: p.scale, initials: ini, font: font, tsize: fx && fx.size, tpos: fx && fx.pos });
+    return FG.art(p.kind, c, { scale: p.scale, initials: ini, font: font, fx: fx });
   };
 })();

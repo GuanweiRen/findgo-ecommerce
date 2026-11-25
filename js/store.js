@@ -36,15 +36,20 @@
     return "€\u00a0" + new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" }).format(n);
   };
 
-  /* ---------- Texto grabado: tamaño y posición ---------- */
-  FG.TEXT_SIZES = { s: { n: "Pequeño", k: .75 }, m: { n: "Mediano", k: 1 }, l: { n: "Grande", k: 1.3 } };
-  FG.TEXT_POS = { top: { n: "Arriba", y: .3 }, mid: { n: "Centro", y: .54 }, bot: { n: "Abajo", y: .78 } };
+  /* ---------- Texto grabado: el cliente lo coloca y lo escala sobre la imagen ----------
+     k: tamaño (1 = normal) · x, y: posición dentro de la zona grabable (0 a 1) */
+  FG.TEXT_DEF = { k: 1, x: .5, y: .54 };
+  FG.textFx = function (o) {
+    function c(v, a, b, d) { if (v == null || v === "" || isNaN(+v)) return d; return Math.round(Math.min(b, Math.max(a, +v)) * 100) / 100; }
+    o = o || {};
+    return { k: c(o.k, .6, 1.8, 1), x: c(o.x, .05, .95, .5), y: c(o.y, .08, .98, .54) };
+  };
   /* Detalles de las iniciales distintos de los de por defecto: tipo de letra, tamaño y posición */
   FG.iniDetails = function (l) {
-    var d = [];
+    var d = [], fx = FG.textFx({ k: l.tk, x: l.tx, y: l.ty });
     if (l.font && l.font !== "clasica" && FG.FONTS[l.font]) d.push(FG.FONTS[l.font].n);
-    if (l.tsize && l.tsize !== "m" && FG.TEXT_SIZES[l.tsize]) d.push("tamaño " + FG.TEXT_SIZES[l.tsize].n.toLowerCase());
-    if (l.tpos && l.tpos !== "mid" && FG.TEXT_POS[l.tpos]) d.push(FG.TEXT_POS[l.tpos].n.toLowerCase());
+    if (fx.k !== 1) d.push("tamaño " + Math.round(fx.k * 100) + " %");
+    if (fx.x !== .5 || fx.y !== .54) d.push("posición personalizada");
     return d;
   };
 
@@ -58,9 +63,9 @@
       var p = FG.product(opt.id); if (!p || p.price == null) return null;
       var line = { id: p.id, qty: Math.max(1, opt.qty || 1), color: opt.color || null, initials: (opt.initials || "").trim().slice(0, 3).toUpperCase(), variant: opt.variant || null };
       line.font = line.initials ? (FG.FONTS[opt.font] ? opt.font : "clasica") : null;
-      line.tsize = line.initials ? (FG.TEXT_SIZES[opt.tsize] ? opt.tsize : "m") : null;
-      line.tpos = line.initials ? (FG.TEXT_POS[opt.tpos] ? opt.tpos : "mid") : null;
-      line.key = [line.id, line.color, line.initials, line.font, line.variant, line.tsize, line.tpos].join("|");
+      var fx = FG.textFx(opt.fx);
+      line.tk = line.initials ? fx.k : null; line.tx = line.initials ? fx.x : null; line.ty = line.initials ? fx.y : null;
+      line.key = [line.id, line.color, line.initials, line.font, line.variant, line.tk, line.tx, line.ty].join("|");
       var cart = this.get(), ex = cart.filter(function (l) { return l.key === line.key; })[0];
       if (ex) ex.qty = Math.min(p.single ? 1 : 99, ex.qty + line.qty); else cart.push(line);
       if (p.single) line.qty = 1;

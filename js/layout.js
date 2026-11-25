@@ -111,7 +111,7 @@
     var up = FG.upsell(2);
     d.querySelector(".drawer-inner").innerHTML =
       '<div class="drawer-head"><h2 class="drawer-title"><span class="ok-dot">' + FG.icon("check") + '</span> Añadido al carrito</h2><button class="icon-btn" data-close aria-label="Cerrar">' + FG.icon("close") + '</button></div>' +
-      '<div class="added-item"><div class="thumb">' + FG.productArt(x.p, line.color, line.initials, line.font, { size: line.tsize, pos: line.tpos }) + '</div><div><strong>' + esc(x.p.name) + '</strong><div class="muted small">' + (opts.join(" · ") || "&nbsp;") + '</div><div class="small"><strong>' + x.line.qty + ' × ' + FG.eur(x.unit) + '</strong></div></div></div>' +
+      '<div class="added-item"><div class="thumb">' + FG.productArt(x.p, line.color, line.initials, line.font, { k: line.tk, x: line.tx, y: line.ty }) + '</div><div><strong>' + esc(x.p.name) + '</strong><div class="muted small">' + (opts.join(" · ") || "&nbsp;") + '</div><div class="small"><strong>' + x.line.qty + ' × ' + FG.eur(x.unit) + '</strong></div></div></div>' +
       FG.progress(t) +
       (up.length ? '<div class="upsell"><h3>Completa tu viaje</h3>' + up.map(function (p) { return '<div class="up-row"><span class="thumb">' + FG.productArt(p) + '</span><span><strong>' + esc(p.name) + '</strong><span class="muted small">' + FG.eur(p.price) + '</span></span><button class="btn btn-sm" data-quick="' + esc(p.id) + '">Añadir</button></div>'; }).join("") + '</div>' : "") +
       '<div class="drawer-actions"><a class="btn btn-primary btn-lg" href="checkout.html">Tramitar pedido</a><a class="btn btn-lg" href="carrito.html">Ver carrito (' + FG.cart.count() + ')</a><button class="btn btn-ghost" data-close>Seguir comprando</button></div>';
