@@ -73,18 +73,19 @@
     if (p.dims) d += " | " + p.dims + (p.weight ? " | " + p.weight : "");
     return d;
   };
-  FG.card = function (p) {
-    var href = p.href || "producto.html?id=" + encodeURIComponent(p.id);
+  FG.card = function (p, opt) {
+    var col = opt && opt.color && p.colors && p.colors.indexOf(opt.color) > -1 ? opt.color : null;
+    var href = p.href || "producto.html?id=" + encodeURIComponent(p.id) + (col ? "&color=" + encodeURIComponent(col) : "");
     var quick = p.price != null && !p.colors && !p.variants && !p.needsInitials;
     var dots = "";
-    if (p.colors) {
+    if (p.colors && !col) {
       dots = '<span class="dots" aria-label="' + p.colors.length + ' colores">' + p.colors.slice(0, 6).map(function (c) { return '<i style="background:' + FG.COLORS[c].hex + '"></i>'; }).join("") + (p.colors.length > 6 ? '<b>+' + (p.colors.length - 6) + '</b>' : "") + '</span>';
     }
     var fav = FG.favs.has(p.id);
     return '<article class="card" data-id="' + esc(p.id) + '">' +
-      '<div class="card-art">' + (p.tag ? '<span class="badge">' + esc(p.tag) + '</span>' : "") + FG.productArt(p) + dots + '</div>' +
+      '<div class="card-art">' + (p.tag ? '<span class="badge">' + esc(p.tag) + '</span>' : "") + FG.productArt(p, col) + dots + '</div>' +
       '<button class="fav-btn' + (fav ? " on" : "") + '" data-fav="' + esc(p.id) + '" aria-pressed="' + fav + '" aria-label="' + (fav ? "Quitar de favoritos: " : "Añadir a favoritos: ") + esc(p.name) + '">' + FG.icon("heart") + '</button>' +
-      '<div class="card-body"><h3 class="card-title"><a class="card-link" href="' + esc(href) + '">' + esc(FG.lineName(p)) + '</a></h3>' +
+      '<div class="card-body"><h3 class="card-title"><a class="card-link" href="' + esc(href) + '">' + esc(FG.lineName(p) + (col ? " · " + FG.colorName(col).toUpperCase() : "")) + '</a></h3>' +
       '<p class="card-desc">' + esc(FG.cardDesc(p)) + '</p>' +
       (p.rating ? '<div class="rate"><span class="st" aria-hidden="true">★★★★★</span><span>' + p.rating.toFixed(1).replace(".", ",") + ' (' + p.reviews + ')</span></div>' : "") +
       '<div class="card-foot"><span class="price">' + FG.priceText(p) + (p.was ? ' <s>' + FG.eur(p.was) + '</s>' : "") + '</span>' +
@@ -124,7 +125,7 @@
       return '<li class="nav-item"><a class="nav-top" href="catalogo.html?cat=' + m.cat + '" data-cat="' + m.cat + '">' + c.name + '</a><div class="mega"><div class="mega-in container">' +
         m.cols.map(function (col) { return '<div><h3>' + col.t + '</h3><ul>' + col.links.map(function (l) { return '<li><a href="' + l[1] + '">' + l[0] + '</a></li>'; }).join("") + '</ul></div>'; }).join("") +
         (function () { var f = FG.product(m.feat); return f ? '<a class="mega-feat" href="' + (f.href || "producto.html?id=" + f.id) + '"><div class="fa">' + FG.productArt(f) + '</div><span>' + esc(FG.lineName(f)) + '</span></a>' : ""; })() + '</div></div></li>';
-    }).join("");
+    }).join("") + '<li class="nav-item"><a class="nav-top" href="todos.html" data-cat="todos">Todos los productos</a></li>';
     var navM = FG.MENU.map(function (m) {
       return '<details><summary>' + FG.CATS[m.cat].name + '</summary>' + m.cols.map(function (col) { return '<p class="mn-t">' + col.t + '</p>' + col.links.map(function (l) { return '<a href="' + l[1] + '">' + l[0] + '</a>'; }).join(""); }).join("") + '</details>';
     }).join("");
@@ -142,7 +143,7 @@
       '<a class="icon-btn has-badge hide-xs" href="cuenta.html#favoritos" aria-label="Favoritos">' + FG.icon("heart") + '<span class="count" id="fav-count" hidden></span></a>' +
       '<a class="icon-btn has-badge" href="carrito.html" aria-label="Carrito">' + FG.icon("bag") + '<span class="count" id="cart-count"></span></a></div></div></header>' +
       '<div class="mnav-wrap" id="mnav-wrap" hidden><div class="mnav-back" data-mclose></div><aside class="mnav" aria-label="Menú"><div class="mnav-head"><span class="logo-text">Menú</span><button class="icon-btn" data-mclose aria-label="Cerrar menú">' + FG.icon("close") + '</button></div>' + navM +
-      '<div class="mn-links">' + (FG.session && FG.session.get() ? '<a href="cuenta.html">Mi cuenta</a>' : '<a href="cuenta.html#entrar">Iniciar sesión</a><a href="cuenta.html#registro">Registrarse</a>') + '<a href="cuenta.html#favoritos">Favoritos</a><a href="devoluciones.html">Devoluciones y garantía</a><a href="empresas.html">Empresas</a></div></aside></div>' +
+      '<div class="mn-links"><a href="todos.html">Todos los productos</a>' + (FG.session && FG.session.get() ? '<a href="cuenta.html">Mi cuenta</a>' : '<a href="cuenta.html#entrar">Iniciar sesión</a><a href="cuenta.html#registro">Registrarse</a>') + '<a href="cuenta.html#favoritos">Favoritos</a><a href="devoluciones.html">Devoluciones y garantía</a><a href="empresas.html">Empresas</a></div></aside></div>' +
       '<dialog class="search-dlg" id="search-dlg" aria-label="Buscar"><form class="search-form" role="search"><span class="s-ico">' + FG.icon("search") + '</span><input id="search-in" type="search" placeholder="Busca maletas, accesorios…" autocomplete="off" enterkeyhint="search" aria-label="Buscar productos"><button type="button" class="icon-btn" data-close aria-label="Cerrar">' + FG.icon("close") + '</button></form><div class="search-sugg" id="search-sugg"><span>Populares:</span>' + ["Cabin", "Batería", "Candado TSA", "Funda", "Mochila"].map(function (t) { return '<button type="button" data-sugg="' + t + '">' + t + '</button>'; }).join("") + '</div><ul class="search-res" id="search-res"></ul></dialog>' +
       '<dialog class="drawer" id="drawer" aria-label="Carrito"><div class="drawer-inner"></div></dialog><div id="toasts" aria-live="polite"></div>';
   }
@@ -155,7 +156,7 @@
       '<div class="trust-it"><span class="ic">' + FG.icon("check").replace('<path d="M5 12.5l4.5 4.5L19 7.5"/>', '<path d="M12 3l7 3v5c0 4.500-3 8-7 10-4-2-7-5.500-7-10V6z"/><path d="M9 12l2 2 4-4"/>') + '</span><div><h3>Garantía de 3 años</h3><p>Cubre la batería de movimiento y el sistema Follow Me.</p></div></div>' +
       '</div></section>' +
       '<footer class="site-footer"><div class="container foot-grid">' +
-      '<div><h4>Comprar</h4><ul>' + Object.keys(FG.CATS).map(function (k) { return '<li><a href="catalogo.html?cat=' + k + '">' + FG.CATS[k].name + '</a></li>'; }).join("") + '</ul></div>' +
+      '<div><h4>Comprar</h4><ul>' + Object.keys(FG.CATS).map(function (k) { return '<li><a href="catalogo.html?cat=' + k + '">' + FG.CATS[k].name + '</a></li>'; }).join("") + '<li><a href="todos.html">Todos los productos</a></li></ul></div>' +
       '<div><h4>Asistencia</h4><ul><li><a href="cuenta.html">Mi cuenta</a></li><li><a href="devoluciones.html">Devoluciones y garantía</a></li><li><a href="index.html#faq">Preguntas frecuentes</a></li><li><a href="empresas.html">Empresas</a></li></ul></div>' +
       '<div><h4>La empresa</h4><ul><li><a href="sobre-nosotros.html">Sobre nosotros</a></li><li><a href="index.html#baterias">Cómo funcionan las baterías</a></li><li><a href="index.html#club">Club FindGo</a></li></ul></div>' +
       '<div><h4>Legal</h4><ul><li><a href="privacidad.html">Política de privacidad</a></li><li><a href="cookies.html">Política de cookies</a></li><li><a href="terminos.html">Términos y condiciones</a></li></ul></div>' +
@@ -182,6 +183,7 @@
     // Navegación actual
     var q = new URLSearchParams(location.search), cat = q.get("cat");
     if (!cat && q.get("id")) { var pp = FG.product(q.get("id")); if (pp) cat = pp.cat; }
+    if (document.body.dataset.all) cat = "todos";
     if (cat) { var a = document.querySelector('.nav-top[data-cat="' + cat + '"]'); if (a) a.setAttribute("aria-current", "page"); }
 
     // Menú móvil

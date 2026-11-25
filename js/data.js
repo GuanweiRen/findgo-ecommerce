@@ -8,7 +8,8 @@
     hielo:     { name: "Blanco hielo", hex: "#eaf1f7" },
     coral:     { name: "Coral",       hex: "#ff7e6b" },
     negro:     { name: "Negro",       hex: "#121316" },
-    cuero:     { name: "Cuero",       hex: "#9a6a3c" }
+    cuero:     { name: "Cuero",       hex: "#9a6a3c" },
+    bosque:    { name: "Verde bosque", hex: "#1f4d3a" }
   };
   var SUIT = ["grafito", "arena", "azul", "salvia", "hielo", "coral", "negro"];
   var BAG = ["grafito", "arena", "azul", "salvia", "hielo", "coral", "negro"];
@@ -32,19 +33,23 @@
 
   var P = [
     // MALETAS
-    { id: "cabin", cat: "maletas", name: "FindGo Cabin 55 cm", price: 349, kind: "suitcase", scale: .78, size: "cabina", func: "maleta", trip: "escapada",
+    { id: "cabin", cat: "maletas", name: "FindGo Cabin 55 cm", price: 349, kind: "suit-cabin", scale: .78, size: "cabina", func: "maleta", trip: "escapada",
       short: "La de cabina: Follow Me, localización y power bank.", colors: SUIT, initials: true, followMe: true, litres: "38 L", weight: "3,9 kg", tag: "Más vendida",
       desc: "Cabe en cabina en casi todas las aerolíneas. Te sigue por el aeropuerto, la ves en el mapa aunque esté facturada y su batería extraíble carga tu móvil.", spec: SPEC_MOVE },
-    { id: "medium", cat: "maletas", name: "FindGo Medium 65 cm", price: 399, kind: "suitcase", scale: .9, size: "mediano", func: "maleta", trip: "largo",
+    { id: "medium", cat: "maletas", name: "FindGo Medium 65 cm", price: 399, kind: "suit-medium", scale: .9, size: "mediano", func: "maleta", trip: "largo",
       short: "Para semanas fuera. Tres ideas clave en un solo cuerpo.", colors: SUIT, initials: true, followMe: true, litres: "65 L", weight: "4,6 kg",
       desc: "El tamaño ideal para una semana o dos. Misma tecnología que la Cabin con más capacidad.", spec: SPEC_MOVE },
-    { id: "large", cat: "maletas", name: "FindGo Large 75 cm", price: 449, kind: "suitcase", scale: 1, size: "grande", func: "maleta", trip: "familia",
+    { id: "large", cat: "maletas", name: "FindGo Large 75 cm", price: 449, kind: "suit-large", scale: 1, size: "grande", func: "maleta", trip: "familia",
       short: "Máxima capacidad para viajes largos o en familia.", colors: SUIT, initials: true, followMe: true, litres: "92 L", weight: "5,3 kg",
       desc: "La más grande de la gama. Pensada para viajes largos o para repartir equipaje entre varias personas.", spec: SPEC_MOVE },
-    { id: "lite", cat: "maletas", name: "FindGo Lite 55 cm", price: 229, kind: "suitcase", scale: .78, size: "cabina", func: "maleta", trip: "escapada",
+    { id: "lite", cat: "maletas", name: "FindGo Lite 55 cm", price: 229, kind: "suit-lite", scale: .78, size: "cabina", func: "maleta", trip: "escapada",
       short: "Solo GPS: sin Follow Me, sin batería extraíble.", colors: SUIT, initials: true, followMe: false, litres: "38 L", weight: "3,1 kg", tag: "Solo GPS",
       desc: "La opción más ligera y económica. Incluye el módulo localizador con pila de botón fija, pero no lleva Follow Me ni batería de movimiento, así que puede facturarse tal cual.",
       spec: [["Follow Me", "No incluido"], ["Módulo localizador", "Pila de botón fija, activo durante meses"], ["Batería extraíble", "No lleva: se factura sin retirar nada"], ["Peso", "3,1 kg"]] },
+
+    { id: "cabin-limited", cat: "maletas", name: "FindGo Cabin Edición Limitada 55 cm", price: 429, kind: "suit-limited", scale: .78, size: "cabina", func: "maleta", trip: "escapada",
+      short: "La Cabin en verde bosque con detalles dorados.", colors: ["bosque"], initials: true, followMe: true, litres: "38 L", weight: "3,9 kg", tag: "Edición limitada",
+      desc: "La misma Cabin con Follow Me, localización y batería extraíble, en un verde bosque exclusivo con franja dorada. Tirada limitada y disponible en un único color.", spec: SPEC_MOVE },
 
     // EQUIPAJE
     { id: "pack-viaje", cat: "equipaje", name: "Pack Viaje (Cabin + Medium)", price: 699, kind: "pack2", size: "pack", func: "pack", trip: "largo", was: 748,
@@ -59,6 +64,9 @@
     { id: "weekender", cat: "equipaje", name: "Bolsa Weekender", price: 129, kind: "duffel", size: "mediano", func: "bolsa", trip: "escapada",
       short: "Para escapadas de fin de semana.", colors: BAG, initials: false, litres: "40 L",
       desc: "Bolsa blanda que se cuelga sobre el asa de la maleta. Cabe bajo el asiento en la mayoría de vuelos." },
+    { id: "underseat", cat: "equipaje", name: "Bolsa Bajo el Asiento", price: 79, kind: "underseat", size: "pequeno", func: "bolsa", trip: "escapada",
+      short: "Cabe bajo el asiento de la mayoría de vuelos.", colors: BAG, initials: false, litres: "18 L",
+      desc: "Bolsa blanda de 40 × 20 × 25 cm para llevar lo imprescindible sin gastar espacio en el compartimento. Lleva bolsillo para el tag localizador y se cuelga del asa de la maleta." },
     { id: "maletin", cat: "equipaje", name: "Maletín Negocios", price: 179, kind: "briefcase", size: "pequeno", func: "trabajo", trip: "negocios",
       short: "Portátil de hasta 16\" y acabado en cuero.", colors: ["negro", "grafito", "azul", "cuero"], initials: false,
       desc: "Maletín para portátil de hasta 16 pulgadas con compartimento para el cargador y encaje en el asa de la maleta." },
@@ -94,6 +102,17 @@
       short: "Set de 3 organizadores.", desc: "Tres cubos de distintos tamaños para separar ropa, calzado y neceser." },
     { id: "bascula", cat: "accesorios", name: "Báscula de equipaje", price: 22, kind: "scale", size: "-", func: "orden", trip: "-",
       short: "Evita sorpresas en el mostrador.", desc: "Báscula digital de mano hasta 50 kg." },
+
+    { id: "neceser", cat: "accesorios", name: "Neceser con localizador", price: 39, kind: "toiletry", size: "-", func: "orden", trip: "-", colors: ["grafito", "azul", "salvia", "coral"],
+      short: "Neceser con tag localizador integrado.", desc: "Neceser impermeable con cremallera amplia y un bolsillo con localizador integrado, para no perder lo que más se olvida." },
+    { id: "laptop", cat: "accesorios", name: "Funda para portátil", price: 29, kind: "laptop", size: "-", func: "funda", trip: "-", colors: ["negro", "grafito", "azul", "arena"], variantLabel: "Tamaño del portátil", variants: [{ n: "13 pulgadas", price: 29 }, { n: "15 pulgadas", price: 34 }, { n: "16 pulgadas", price: 39 }],
+      short: "Acolchada, con bolsillo para el cargador (29 a 39 €).", desc: "Funda acolchada con cierre de cremallera y bolsillo para el cargador. Elige el tamaño de tu portátil." },
+    { id: "adaptador", cat: "accesorios", name: "Adaptador de enchufe universal", price: 22, kind: "plug", size: "-", func: "energia", trip: "-",
+      short: "Un adaptador para Europa, Reino Unido, EE. UU. y Australia.", desc: "Adaptador de enchufe universal con cuatro salidas de clavija y protección contra sobrecargas. Compatible con el cargador USB-C de FindGo." },
+    { id: "almohada", cat: "accesorios", name: "Almohada de viaje", price: 26, kind: "pillow", size: "-", func: "comodidad", trip: "-", colors: ["grafito", "azul", "salvia", "coral"],
+      short: "Almohada cervical de espuma viscoelástica.", desc: "Almohada cervical de espuma viscoelástica con funda lavable. Se pliega y cuelga de la maleta con un mosquetón." },
+    { id: "kit-ruedas", cat: "accesorios", name: "Kit de recambio de ruedas", price: 29, kind: "wheelkit", size: "-", func: "reparacion", trip: "-",
+      short: "Cuatro ruedas giratorias y la llave para cambiarlas.", desc: "Kit con cuatro ruedas dobles giratorias, ejes y llave, compatible con toda la gama FindGo. Se cambia en pocos minutos." },
 
     // SERVICIOS
     { id: "garantia", cat: "servicios", name: "Garantía ampliada", price: 39, kind: "shield", size: "-", func: "garantia", trip: "-", noDiscount: true,
@@ -143,7 +162,8 @@
     cabin:  { dims: "55 × 40 × 23 cm", who: "Escapadas de 1 a 3 días", days: "corto", cabinOk: true },
     medium: { dims: "65 × 44 × 27 cm", who: "Viajes de 4 a 7 días", days: "semana", cabinOk: false },
     large:  { dims: "75 × 50 × 30 cm", who: "Viajes largos o en familia", days: "largo", cabinOk: false },
-    lite:   { dims: "55 × 40 × 23 cm", who: "Quien solo quiere localizarla", days: "corto", cabinOk: true }
+    lite:   { dims: "55 × 40 × 23 cm", who: "Quien solo quiere localizarla", days: "corto", cabinOk: true },
+    "cabin-limited": { dims: "55 × 40 × 23 cm", who: "Quien quiere una Cabin diferente", days: "corto", cabinOk: true }
   };
   P.forEach(function (p) { var e = EXTRA[p.id]; if (e) for (var k in e) p[k] = e[k]; });
 
@@ -177,7 +197,11 @@
     redondeada:{ n: "Redondeada",        f: "Fredoka, sans-serif",              w: 500, k: 1.05, ls: 3 }
   };
 
+  // Orden de «más vendidos» (ilustrativo: la tienda es de ejemplo y no tiene ventas reales)
+  var BEST = ["cabin", "medium", "bateria", "candado", "lite", "mochila-day", "large", "tag", "pack-viaje", "funda", "premium", "weekender", "p-iniciales", "cargador", "cabin-limited", "almohada", "adaptador", "maletin", "kids", "pack-familia", "correa", "bascula", "organizadores", "neceser", "underseat", "laptop", "kit-ruedas", "p-asas", "p-etiqueta", "p-funda-diseno", "garantia", "reparacion", "empresas"];
+
   window.FG = window.FG || {};
+  FG.BESTSELLERS = BEST;
   FG.FONTS = FONTS;
   FG.COLORS = COLORS; FG.CATS = CATS; FG.PRODUCTS = P; FG.MENU = MENU; FG.COMPETITION = COMPETITION; FG.REVIEWS = REVIEWS; FG.FAQ = FAQ;
   FG.product = function (id) { return P.filter(function (p) { return p.id === id; })[0]; };

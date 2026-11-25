@@ -148,7 +148,7 @@
 
   /* ================= CATÁLOGO ================= */
   var LABELS = { size: { cabina: "Cabina", mediano: "Mediano", grande: "Grande", pequeno: "Pequeño", pack: "Packs" },
-    func: { maleta: "Maletas", pack: "Packs", mochila: "Mochilas", bolsa: "Bolsas", trabajo: "Trabajo", infantil: "Infantil", grabado: "Grabado", color: "Color", funda: "Fundas", etiqueta: "Etiquetas", energia: "Energía", localizador: "Localizadores", seguridad: "Seguridad", orden: "Organización", garantia: "Garantía", app: "App", reparacion: "Reparación", b2b: "Empresas" },
+    func: { maleta: "Maletas", pack: "Packs", mochila: "Mochilas", bolsa: "Bolsas", trabajo: "Trabajo", infantil: "Infantil", grabado: "Grabado", color: "Color", funda: "Fundas", etiqueta: "Etiquetas", energia: "Energía", comodidad: "Comodidad", localizador: "Localizadores", seguridad: "Seguridad", orden: "Organización", garantia: "Garantía", app: "App", reparacion: "Reparación", b2b: "Empresas" },
     trip: { escapada: "Escapada", negocios: "Negocios", familia: "Familia", largo: "Viaje largo" } };
   var NAMES = { size: "Tamaño", func: "Función", trip: "Tipo de viaje", color: "Color", sort: "Ordenar" };
 
@@ -174,9 +174,13 @@
 
   var PR = { "0-50": [0, 50, "Hasta 50 €"], "50-200": [50, 200, "De 50 a 200 €"], "200-400": [200, 400, "De 200 a 400 €"], "400+": [400, 1e9, "Más de 400 €"] };
 
+  var COLOR_CARDS = { cabin: 1, medium: 1 };  // en Maletas, una tarjeta por color
   function catalog() {
+    var ALL = !!document.body.dataset.all, PAGE = ALL ? "todos.html" : "catalogo.html";
     var q = new URLSearchParams(location.search), st = { cat: q.get("cat") || "", size: q.get("size") || "", func: q.get("func") || "", trip: q.get("trip") || "", color: "", pmin: q.get("pmin") || "", pmax: q.get("pmax") || "", fm: q.get("fm") || "", q: q.get("q") || "", sort: q.get("sort") || "" };
     if (st.cat && !FG.CATS[st.cat]) st.cat = "";
+    if (ALL) { st.cat = ""; $("#sort").options[0].textContent = "Más vendidos"; }
+    var RANK = {}; FG.BESTSELLERS.forEach(function (id, i) { RANK[id] = i; });
     var closed = {};
 
     var base = FG.PRODUCTS.filter(function (p) { return !st.cat || p.cat === st.cat; });
@@ -232,32 +236,36 @@
     function drawGrid() {
       var list = base.filter(function (p) { return ok(p); });
       if (st.sort) list = list.slice().sort(function (a, b) { var x = a.price == null ? 1e9 : a.price, y = b.price == null ? 1e9 : b.price; return st.sort === "asc" ? x - y : y - x; });
-      var title = st.q ? "Resultados para «" + st.q + "»" : st.cat ? FG.CATS[st.cat].name : "Todo el catálogo";
+      else if (ALL && !st.q) list = list.slice().sort(function (a, b) { return (RANK[a.id] == null ? 999 : RANK[a.id]) - (RANK[b.id] == null ? 999 : RANK[b.id]); });
+      var title = st.q ? "Resultados para «" + st.q + "»" : ALL ? "Todos los productos" : st.cat ? FG.CATS[st.cat].name : "Todo el catálogo";
       $("#cat-title").textContent = title; document.title = title + " · FindGo"; $("#crumb").textContent = title;
-      $("#cat-desc").textContent = st.cat ? FG.CATS[st.cat].desc : "Todo lo que necesitas para viajar con FindGo.";
-      $("#count").textContent = list.length + (list.length === 1 ? " producto" : " productos");
+      $("#cat-desc").textContent = ALL ? "Toda la tienda, de los más vendidos a los menos vendidos." : st.cat ? FG.CATS[st.cat].desc : "Todo lo que necesitas para viajar con FindGo.";
+      // En Maletas la Cabin y la Medium salen una vez por cada color
+      var cardList = [];
+      list.forEach(function (p) { if (st.cat === "maletas" && !st.q && COLOR_CARDS[p.id] && p.colors) p.colors.forEach(function (c) { cardList.push(FG.card(p, { color: c })); }); else cardList.push(FG.card(p)); });
+      $("#count").textContent = cardList.length + (cardList.length === 1 ? " producto" : " productos");
       $("#sort").value = st.sort;
       var n = active().length, fb = $("#f-badge"); fb.hidden = !n; fb.textContent = n;
       var chips = "";
       if (st.q) chips += '<button class="chip" data-clear="q">Búsqueda: «' + esc(st.q) + '» ✕</button>';
       active().forEach(function (k) { chips += '<button class="chip" data-clear="' + k + '">' + (k === "fm" ? "" : NAMES[k] ? NAMES[k] + ": " : k === "price" ? "Precio: " : "") + esc(labelOf(k)) + ' ✕</button>'; });
       $("#chips").innerHTML = chips ? chips + '<button class="chip chip-clear" data-clear="all">Limpiar todo</button>' : "";
-      var cards = list.map(FG.card);
+      var cards = cardList;
       $("#grid").innerHTML = list.length ? cards.join("") : !base.length && st.q
         ? '<div class="empty" style="grid-column:1/-1"><h3>No encontramos «' + esc(st.q) + '»</h3><p>Prueba con ' + FG.SEARCH_SUGG.map(function (x) { return '<a class="link-u" href="catalogo.html?q=' + encodeURIComponent(x) + '">' + esc(x) + '</a>'; }).join(", ") + '.</p><a class="btn btn-primary" href="catalogo.html">Ver todo el catálogo</a></div>'
         : '<div class="empty" style="grid-column:1/-1"><h3>No hay productos con esos filtros</h3><p>Prueba a quitar alguno.</p><button class="btn btn-primary" data-clear="all">Limpiar filtros</button></div>';
       var pb = $("#promo");
       pb.innerHTML = list.length && st.cat !== "personalizacion" && !st.q ? '<div class="promo-bar"><div class="pb-art" aria-hidden="true">' + FG.art("tag", "cuero", { initials: "AB" }) + FG.art("engrave", "azul", { initials: "AMG" }) + '</div><div class="pb-text"><strong>Hazla tuya</strong><p>Iniciales grabadas, asas de color y fundas con tu diseño.</p></div><a class="btn btn-sm" href="catalogo.html?cat=personalizacion">Ver personalización</a></div>' : "";
-      var fa = $("#f-apply"); if (fa) fa.textContent = "Ver " + list.length + (list.length === 1 ? " resultado" : " resultados");
+      var fa = $("#f-apply"); if (fa) fa.textContent = "Ver " + cards.length + (cards.length === 1 ? " resultado" : " resultados");
       if (!drawGrid.first) $("#grid").querySelectorAll(".card").forEach(function (c, i) { c.classList.add("rise"); c.style.animationDelay = Math.min(i, 8) * 40 + "ms"; });
       drawGrid.first = 1;
     }
     function sync() {
       var p = new URLSearchParams(); Object.keys(st).forEach(function (k) { if (st[k]) p.set(k, st[k]); });
-      try { history.replaceState(null, "", "catalogo.html" + (p.toString() ? "?" + p : "")); } catch (e) {}
+      try { history.replaceState(null, "", PAGE + (p.toString() ? "?" + p : "")); } catch (e) {}
     }
     function update() { sync(); drawFilters(); drawGrid(); }
-    function clearKey(k) { if (k === "all") { ["size", "func", "trip", "color", "pmin", "pmax", "fm"].forEach(function (x) { st[x] = ""; }); } else if (k === "q") { location.href = "catalogo.html" + (st.cat ? "?cat=" + st.cat : ""); return; } else if (k === "price") { st.pmin = ""; st.pmax = ""; } else st[k] = ""; update(); }
+    function clearKey(k) { if (k === "all") { ["size", "func", "trip", "color", "pmin", "pmax", "fm"].forEach(function (x) { st[x] = ""; }); } else if (k === "q") { location.href = PAGE + (st.cat ? "?cat=" + st.cat : ""); return; } else if (k === "price") { st.pmin = ""; st.pmax = ""; } else st[k] = ""; update(); }
 
     var panel = $("#filters"), back = $("#f-back");
     function openPanel(v) { panel.classList.toggle("open", v); back.hidden = !v; document.body.classList.toggle("no-scroll", v && window.innerWidth < 960); if (v) { var f = panel.querySelector("input:checked,input,button"); if (f) f.focus({ preventScroll: true }); } else $("#filter-open").focus({ preventScroll: true }); }
@@ -323,7 +331,7 @@
       '<div class="p-price"><b id="price"></b>' + (p.was ? ' <s>' + FG.eur(p.was) + '</s>' : "") + (p.monthly ? ' <small class="muted">primer mes, cancelable</small>' : "") + ' <small class="muted p-vat">IVA incluido</small><span class="stock"><i></i>En existencias</span></div>';
     if (p.initials && !needIni) h += '<div class="p-offer">Iniciales grabadas por solo +' + FG.eur(19) + '</div>';
     if (isSuit) h += '<div class="p-opt"><div class="p-lab"><b>Tamaño</b> <span>' + p.dims + '</span> <a href="index.html#tamano">Guía de tamaños</a></div><div class="boxes">' + SUIT.map(function (sid) { var q = FG.product(sid); return '<a class="box' + (sid === p.id ? " on" : "") + '" href="producto.html?id=' + sid + (s.color ? "&color=" + s.color : "") + '"' + (sid === p.id ? ' aria-current="page"' : "") + '>' + esc(FG.lineName(q)) + '<small>' + q.dims.split(" × ")[0] + ' cm</small></a>'; }).join("") + '</div></div>';
-    if (p.variants) h += '<div class="p-opt"><div class="p-lab"><b>Talla de la maleta</b></div><div class="boxes" role="radiogroup" aria-label="Talla">' + p.variants.map(function (v) { return '<button class="box" role="radio" aria-checked="false" data-variant="' + v.n + '">' + v.n + '<small>' + FG.eur(v.price) + '</small></button>'; }).join("") + '</div></div>';
+    if (p.variants) h += '<div class="p-opt"><div class="p-lab"><b>' + (p.variantLabel || "Talla de la maleta") + '</b></div><div class="boxes" role="radiogroup" aria-label="' + (p.variantLabel || "Talla") + '">' + p.variants.map(function (v) { return '<button class="box" role="radio" aria-checked="false" data-variant="' + v.n + '">' + v.n + '<small>' + FG.eur(v.price) + '</small></button>'; }).join("") + '</div></div>';
     if (p.colors) h += '<div class="p-opt"><div class="p-lab"><b>Color</b> <span id="color-name"></span></div><div class="swatches" role="radiogroup" aria-label="Color">' + p.colors.map(function (c) { return '<button class="swatch" role="radio" aria-checked="false" data-color="' + c + '" aria-label="' + FG.colorName(c) + '"><i style="background:' + FG.COLORS[c].hex + '"></i></button>'; }).join("") + '</div></div>';
     if (p.initials) h += '<div class="field p-ini"><label for="ini">Iniciales grabadas' + (needIni ? "" : " (opcional)") + '</label><input id="ini" maxlength="3" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="Ej.: AMG"><span class="hint">Hasta 3 letras o números. Producto personalizado: no admite devolución salvo defecto.</span><span class="err" id="ini-err">Escribe al menos una inicial.</span></div>';
     if (p.initials) h += '<div class="p-opt p-font"><div class="p-lab"><b>Tipo de letra</b> <span id="font-name"></span></div><div class="boxes" role="radiogroup" aria-label="Tipo de letra">' + Object.keys(FG.FONTS).map(function (k) { var f = FG.FONTS[k]; return '<button type="button" class="box" role="radio" aria-checked="false" data-font="' + k + '" aria-label="' + esc(f.n) + '"><span class="font-sample" style="font-family:' + f.f + ';font-weight:' + f.w + '">ABC</span><small>' + esc(f.n) + '</small></button>'; }).join("") + '</div></div>';
