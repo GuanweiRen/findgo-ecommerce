@@ -424,7 +424,19 @@
     var gal = $("#gal");
     gal.addEventListener("scroll", function () { var n = Math.round(gal.scrollLeft / gal.clientWidth) + 1, el = $("#gal-count"); if (el && gal.scrollWidth > gal.clientWidth + 2) el.textContent = n + " / " + views.length; }, { passive: true });
 
-    if (p.reviews) { $("#reviews").hidden = false; $("#rev-list").innerHTML = FG.REVIEWS.filter(function (r) { return r.p === p.id; }).map(function (r) { return '<article class="rev"><div class="st" aria-label="' + r.r + ' de 5">' + "★★★★★".slice(0, r.r) + '<span class="off">' + "★★★★★".slice(r.r) + '</span></div><h3>' + esc(r.t) + '</h3><p>' + esc(r.x) + '</p><small>' + esc(r.n) + ' · opinión de ejemplo</small></article>'; }).join(""); }
+    if (p.reviews) {
+      $("#reviews").hidden = false;
+      var mine = FG.REVIEWS.filter(function (r) { return r.p === p.id; });
+      var revHTML = function (r) { return '<article class="rev"><div class="st" aria-label="' + r.r + ' de 5">' + "★★★★★".slice(0, r.r) + '<span class="off">' + "★★★★★".slice(r.r) + '</span></div><h3>' + esc(r.t) + '</h3><p>' + esc(r.x) + '</p><small>' + esc(r.n) + ' · opinión de ejemplo</small></article>'; };
+      // Se muestran 3 y el resto con «Ver todas las opiniones»
+      $("#rev-list").innerHTML = mine.slice(0, 3).map(revHTML).join("");
+      if (mine.length > 3) {
+        var more = document.createElement("button"); more.type = "button"; more.className = "btn btn-ghost"; more.style.marginTop = "18px";
+        more.textContent = "Ver todas las opiniones (" + mine.length + ")";
+        more.addEventListener("click", function () { $("#rev-list").innerHTML = mine.map(revHTML).join(""); more.remove(); });
+        $("#rev-list").insertAdjacentElement("afterend", more);
+      }
+    }
     var rel = FG.upsell(4);
     if (!rel.length) rel = FG.PRODUCTS.filter(function (x) { return x.cat === p.cat && x.id !== p.id; }).slice(0, 4);
     if (rel.length) { $("#related").hidden = false; $("#related-grid").innerHTML = rel.map(FG.card).join(""); }
