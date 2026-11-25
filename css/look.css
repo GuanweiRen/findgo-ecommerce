@@ -625,3 +625,10 @@ button.nav-top { background: none; border: 0; margin: 0; font-family: inherit; c
 .gal-art .ini-h { fill: #fff; stroke: #121316; stroke-width: 1.5; cursor: nwse-resize; touch-action: none; }
 .p-drag-hint { margin: -6px 0 18px; font-size: .84rem; color: var(--ink-2); }
 .p-drag-hint .link-u { font-size: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+
+/* Valoración arriba en la ficha, con el mismo bloque que la portada */
+.p-rev-sum { margin: 0; gap: 12px; flex-wrap: nowrap; }
+.p-rev-sum .big { font-size: 2.2rem; }
+.p-rev-sum .st { font-size: .95rem; }
+.p-rev-sum a { display: block; color: var(--ink-2); }
+.st .off { opacity: .25; }

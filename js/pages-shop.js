@@ -124,7 +124,8 @@
     $("#comp").innerHTML = FG.COMPETITION.map(function (r) { return "<tr>" + r.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") + '<tr class="us"><td>FindGo</td><td>Seguimiento + localización + personalización</td><td>229 a 449 € (Cabin 349 €)</td><td>—</td></tr>';
     var avg = FG.REVIEWS.reduce(function (a, r) { return a + r.r; }, 0) / FG.REVIEWS.length, big = $(".rev-sum .big");
     if (big) big.textContent = avg.toFixed(1).replace(".", ",");
-    $("#revs").innerHTML = FG.REVIEWS.slice(0, 3).map(function (r) { return '<article class="rev"><div class="st" aria-label="' + r.r + ' de 5">' + "★★★★★".slice(0, r.r) + '<span class="off">' + "★★★★★".slice(r.r) + '</span></div><h3>' + esc(r.t) + '</h3><p>' + esc(r.x) + '</p><small>' + esc(r.n) + ' · opinión de ejemplo</small></article>'; }).join("");
+    if ($("#rev-count")) $("#rev-count").textContent = "Valoración media · " + FG.REVIEWS.length + " opiniones";
+    $("#revs").innerHTML = FG.REVIEWS.slice(0, 3).map(function (r) { return '<article class="rev"><div class="st" aria-label="' + r.r + ' de 5">' + "★★★★★".slice(0, r.r) + '<span class="off">' + "★★★★★".slice(r.r) + '</span></div><h3>' + esc(r.t) + '</h3><p>' + esc(r.x) + '</p><small>' + esc(r.n) + '</small></article>'; }).join("");
     $("#faq-list").innerHTML = FG.FAQ.map(function (q, i) { return '<details class="faq"' + (i === 0 ? " open" : "") + '><summary>' + esc(q[0]) + '</summary><p>' + esc(q[1]) + '</p></details>'; }).join("");
 
     var cbox = $("#club-box");
@@ -326,7 +327,8 @@
       return { svg: FG.art("pack3", s.color || "azul"), cap: "Cabin 55 cm · Medium 65 cm · Large 75 cm." };
     }
     var SUIT = ["cabin", "medium", "large", "lite"], isSuit = SUIT.indexOf(p.id) > -1;
-    var rate = p.rating ? '<div class="p-rate" aria-label="Valoración ' + p.rating + ' de 5"><span class="st" aria-hidden="true">' + "★★★★★".slice(0, Math.round(p.rating)) + '<span class="off">' + "★★★★★".slice(Math.round(p.rating)) + '</span></span> <a href="#reviews">' + p.rating.toFixed(1).replace(".", ",") + " · " + p.reviews + (p.reviews === 1 ? " opinión" : " opiniones") + "</a></div>" : "";
+    var rStars = p.rating ? "★★★★★".slice(0, Math.round(p.rating)) + '<span class="off">' + "★★★★★".slice(Math.round(p.rating)) + '</span>' : "";
+    var rate = p.rating ? '<div class="rev-sum p-rev-sum" aria-label="Valoración ' + p.rating.toFixed(1).replace(".", ",") + ' de 5, ' + p.reviews + (p.reviews === 1 ? " opinión" : " opiniones") + '"><span class="big">' + p.rating.toFixed(1).replace(".", ",") + '</span><div><div class="st" aria-hidden="true">' + rStars + '</div><a class="muted small" href="#reviews">' + p.reviews + (p.reviews === 1 ? " opinión" : " opiniones") + '</a></div></div>' : "";
     var subtitle = p.followMe ? "Maleta inteligente con Follow Me" : p.id === "lite" ? "Maleta con localizador GPS" : esc(p.short || "");
     var h = '<div class="pdp2"><div class="gal" id="gal" aria-label="Imágenes del producto"></div><div class="pinfo">' +
       '<nav class="crumbs" aria-label="Migas"><a href="index.html">Inicio</a> / <a href="catalogo.html?cat=' + p.cat + '">' + FG.CATS[p.cat].name + '</a></nav>' +
@@ -427,7 +429,7 @@
     if (p.reviews) {
       $("#reviews").hidden = false;
       var mine = FG.REVIEWS.filter(function (r) { return r.p === p.id; });
-      var revHTML = function (r) { return '<article class="rev"><div class="st" aria-label="' + r.r + ' de 5">' + "★★★★★".slice(0, r.r) + '<span class="off">' + "★★★★★".slice(r.r) + '</span></div><h3>' + esc(r.t) + '</h3><p>' + esc(r.x) + '</p><small>' + esc(r.n) + ' · opinión de ejemplo</small></article>'; };
+      var revHTML = function (r) { return '<article class="rev"><div class="st" aria-label="' + r.r + ' de 5">' + "★★★★★".slice(0, r.r) + '<span class="off">' + "★★★★★".slice(r.r) + '</span></div><h3>' + esc(r.t) + '</h3><p>' + esc(r.x) + '</p><small>' + esc(r.n) + '</small></article>'; };
       // Se muestran 3 y el resto con «Ver todas las opiniones»
       $("#rev-list").innerHTML = mine.slice(0, 3).map(revHTML).join("");
       if (mine.length > 3) {
